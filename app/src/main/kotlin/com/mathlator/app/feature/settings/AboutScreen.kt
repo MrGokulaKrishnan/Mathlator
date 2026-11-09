@@ -68,7 +68,7 @@ fun AboutScreen(
             Spacer(Modifier.height(32.dp))
 
             Text(
-                text = "Version 1.0.0",
+                text = "${com.mathlator.app.BuildConfig.VERSION_NAME} · build ${com.mathlator.app.BuildConfig.BUILD_TIME} · ${com.mathlator.app.BuildConfig.GIT_HASH}",
                 color = colors.textDim,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
