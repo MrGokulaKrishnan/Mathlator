@@ -243,7 +243,7 @@ class Evaluator(private val angleMode: AngleMode) {
             }
             "sqrt" -> {
                 if (arg.compareTo(ZERO) < 0) throw EvalException(EvalError.DomainError)
-                arg.sqrt(MC)
+                bigDecimalSqrt(arg, MC)
             }
             "exp"  -> snapD(exp(arg.toDouble()))
             "pow10" -> snapD(10.0.pow(arg.toDouble()))
@@ -261,6 +261,23 @@ class Evaluator(private val angleMode: AngleMode) {
         if (!d.isFinite()) throw EvalException(EvalError.Overflow)
         val snapped = if (abs(d) < SNAP_THRESHOLD) 0.0 else d
         return BigDecimal(snapped, MC)
+    }
+
+    private fun bigDecimalSqrt(x: BigDecimal, mc: MathContext): BigDecimal {
+        if (x.compareTo(ZERO) == 0) return ZERO
+        val d = x.toDouble()
+        var x0 = if (d.isFinite() && d > 0.0) {
+            BigDecimal(sqrt(d), mc)
+        } else {
+            BigDecimal.TEN.pow(x.precision() / 2, mc)
+        }
+        val two = BigDecimal(2)
+        for (i in 0 until 15) {
+            val next = x0.add(x.divide(x0, mc)).divide(two, mc)
+            if (next == x0) break
+            x0 = next
+        }
+        return x0
     }
 
     private fun power(base: BigDecimal, exp: BigDecimal): BigDecimal {
