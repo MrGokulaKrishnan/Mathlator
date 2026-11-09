@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Adaptive icon foreground: 108dp canvas, 66dp safe zone.
+  Two horizontal rounded bars (the "=" mark), each 46×8dp, 14dp gap,
+  centered, with brand gradient #FF5A00 → #FF7D1A.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Top bar: centered horizontally, centered vertically minus (14+8)/2 = 11 from center -->
+    <!-- Center = 54. Top bar: y = 54 - 7 - 8 = 39, h=8 -->
+    <!-- Bottom bar: y = 54 + 7 = 61, h=8 -->
+    <!-- Left x = (108-46)/2 = 31 -->
+
+    <!-- Top orange bar -->
+    <path
+        android:pathData="M32,39 L76,39 Q77.5,39 77.5,40.5 L77.5,46.5 Q77.5,48 76,48 L32,48 Q30.5,48 30.5,46.5 L30.5,40.5 Q30.5,39 32,39 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="30.5"
+                android:startY="43.5"
+                android:endX="77.5"
+                android:endY="43.5"
+                android:type="linear">
+                <item android:offset="0" android:color="#FFFF5A00"/>
+                <item android:offset="1" android:color="#FFFF7D1A"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Bottom orange bar -->
+    <path
+        android:pathData="M32,61 L76,61 Q77.5,61 77.5,62.5 L77.5,68.5 Q77.5,70 76,70 L32,70 Q30.5,70 30.5,68.5 L30.5,62.5 Q30.5,61 32,61 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="30.5"
+                android:startY="65.5"
+                android:endX="77.5"
+                android:endY="65.5"
+                android:type="linear">
+                <item android:offset="0" android:color="#FFFF5A00"/>
+                <item android:offset="1" android:color="#FFFF7D1A"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

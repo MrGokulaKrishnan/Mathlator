@@ -1,0 +1,22 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Build outputs and distributions
+dist/
+app/build/
+
+# Keystores & credentials - NEVER COMMIT
+keystore/
+*.jks
+*.keystore
+keystore.properties
+*.key
+*.pem

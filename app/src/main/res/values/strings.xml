@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App name -->
+    <string name="app_name">Mathlator</string>
+
+    <!-- Tab labels -->
+    <string name="tab_calculator">Calculator</string>
+    <string name="tab_converters">Converters</string>
+    <string name="tab_finance">Finance</string>
+
+    <!-- Top bar menu -->
+    <string name="menu_history">History</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_about">About</string>
+    <string name="menu_more">More options</string>
+
+    <!-- Calculator keys -->
+    <string name="key_clear">Clear all</string>
+    <string name="key_delete">Delete</string>
+    <string name="key_percent">Percent</string>
+    <string name="key_divide">Divide</string>
+    <string name="key_multiply">Multiply</string>
+    <string name="key_subtract">Minus</string>
+    <string name="key_add">Plus</string>
+    <string name="key_equals">Equals</string>
+    <string name="key_decimal">Decimal point</string>
+    <string name="key_mode_toggle">Toggle scientific mode</string>
+    <string name="key_open_paren">Open parenthesis</string>
+    <string name="key_close_paren">Close parenthesis</string>
+    <string name="key_square">Square</string>
+    <string name="key_power">Power</string>
+    <string name="key_sqrt">Square root</string>
+    <string name="key_sin">Sine</string>
+    <string name="key_cos">Cosine</string>
+    <string name="key_tan">Tangent</string>
+    <string name="key_ln">Natural logarithm</string>
+    <string name="key_log">Logarithm base 10</string>
+    <string name="key_pi">Pi</string>
+    <string name="key_e">Euler\'s number</string>
+    <string name="key_factorial">Factorial</string>
+    <string name="key_second">Second function</string>
+    <string name="key_angle_mode">Toggle angle mode</string>
+    <string name="key_asin">Arc sine</string>
+    <string name="key_acos">Arc cosine</string>
+    <string name="key_atan">Arc tangent</string>
+    <string name="key_exp">e to the power of x</string>
+    <string name="key_ten_power">10 to the power of x</string>
+
+    <!-- Display -->
+    <string name="display_expression">Expression</string>
+    <string name="display_result">Result</string>
+    <string name="display_empty">0</string>
+    <string name="result_format">= %s</string>
+
+    <!-- Errors -->
+    <string name="error_division_by_zero">Can\'t divide by 0</string>
+    <string name="error_domain">Domain error</string>
+    <string name="error_overflow">Number too large</string>
+    <string name="error_syntax">Invalid expression</string>
+
+    <!-- Actions -->
+    <string name="action_copy">Copy</string>
+    <string name="action_share">Share</string>
+    <string name="action_copied">Copied to clipboard</string>
+    <string name="action_undo">Undo</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_clear_all">Clear all</string>
+    <string name="action_confirm_clear">Clear all history?</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_load">Load</string>
+    <string name="action_swap">Swap</string>
+    <string name="action_share_csv">Share as CSV</string>
+
+    <!-- History -->
+    <string name="history_title">History</string>
+    <string name="history_empty">No calculations yet</string>
+    <string name="history_today">Today</string>
+    <string name="history_yesterday">Yesterday</string>
+    <string name="history_deleted">Calculation deleted</string>
+    <string name="history_clear_confirm">This will delete all %d calculations. This cannot be undone.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_system">System</string>
+    <string name="settings_haptics">Haptics</string>
+    <string name="settings_key_sound">Key sound</string>
+    <string name="settings_calculator">Calculator</string>
+    <string name="settings_angle_mode">Angle mode</string>
+    <string name="settings_angle_deg">DEG</string>
+    <string name="settings_angle_rad">RAD</string>
+    <string name="settings_decimal_precision">Decimal precision</string>
+    <string name="settings_digit_grouping">Digit grouping</string>
+    <string name="settings_grouping_indian">Indian (12,34,567)</string>
+    <string name="settings_grouping_international">International (1,234,567)</string>
+    <string name="settings_grouping_none">None</string>
+    <string name="settings_keep_screen_on">Keep screen on</string>
+    <string name="settings_one_handed_side">One-handed side</string>
+    <string name="settings_side_left">Left</string>
+    <string name="settings_side_right">Right</string>
+    <string name="settings_data">Data</string>
+    <string name="settings_default_currency">Default currency pair</string>
+    <string name="settings_clear_history">Clear history</string>
+    <string name="settings_clear_rates">Clear cached rates</string>
+    <string name="settings_history_cleared">History cleared</string>
+    <string name="settings_rates_cleared">Cached rates cleared</string>
+
+    <!-- About -->
+    <string name="about_title">About</string>
+    <string name="about_tagline">Works offline except for currency rates.\nNo data is collected.</string>
+    <string name="about_version">Version %s</string>
+
+    <!-- Converters -->
+    <string name="converters_title">Converters</string>
+    <string name="converter_age">Age</string>
+    <string name="converter_area">Area</string>
+    <string name="converter_bmi">BMI</string>
+    <string name="converter_data">Data</string>
+    <string name="converter_date">Date</string>
+    <string name="converter_discount">Discount</string>
+    <string name="converter_length">Length</string>
+    <string name="converter_mass">Mass</string>
+    <string name="converter_numeral">Numeral system</string>
+    <string name="converter_speed">Speed</string>
+    <string name="converter_temperature">Temperature</string>
+    <string name="converter_time">Time</string>
+    <string name="converter_volume">Volume</string>
+
+    <string name="unit_from">FROM</string>
+    <string name="unit_to">TO</string>
+    <string name="unit_search_hint">Search units…</string>
+    <string name="unit_all_units">All units</string>
+    <string name="unit_copy_value">Copy value</string>
+    <string name="unit_common">Common</string>
+    <string name="unit_other">Other</string>
+
+    <!-- Data converter -->
+    <string name="data_decimal">Decimal (1000ⁿ)</string>
+    <string name="data_binary">Binary (1024ⁿ)</string>
+
+    <!-- Numeral -->
+    <string name="numeral_title">Numeral System</string>
+    <string name="numeral_hint">Integers only, up to 128 bits</string>
+    <string name="numeral_bin">BIN</string>
+    <string name="numeral_oct">OCT</string>
+    <string name="numeral_dec">DEC</string>
+    <string name="numeral_hex">HEX</string>
+
+    <!-- Date -->
+    <string name="date_title">Date</string>
+    <string name="date_difference">Difference</string>
+    <string name="date_add_subtract">Add / Subtract</string>
+    <string name="date_start">Start date</string>
+    <string name="date_end">End date</string>
+    <string name="date_base">Base date</string>
+    <string name="date_add">Add</string>
+    <string name="date_subtract">Subtract</string>
+    <string name="date_years">Years</string>
+    <string name="date_months">Months</string>
+    <string name="date_days">Days</string>
+    <string name="date_weeks">Weeks</string>
+    <string name="date_total_days">Total days</string>
+    <string name="date_result">Result date</string>
+    <string name="date_weekday">Weekday</string>
+
+    <!-- Age -->
+    <string name="age_title">Age</string>
+    <string name="age_dob">Date of birth</string>
+    <string name="age_at">Age at</string>
+    <string name="age_years">%d years</string>
+    <string name="age_months">%d months</string>
+    <string name="age_days">%d days</string>
+    <string name="age_total_months">Total months: %d</string>
+    <string name="age_total_weeks">Total weeks: %d</string>
+    <string name="age_total_days">Total days: %d</string>
+    <string name="age_total_hours">Total hours: %d</string>
+    <string name="age_next_birthday">Next birthday</string>
+    <string name="age_next_birthday_days">in %d days</string>
+    <string name="age_error_dob">Date of birth cannot be after target date</string>
+
+    <!-- BMI -->
+    <string name="bmi_title">BMI</string>
+    <string name="bmi_metric">Metric</string>
+    <string name="bmi_imperial">Imperial</string>
+    <string name="bmi_height_cm">Height (cm)</string>
+    <string name="bmi_height_ft">Height (ft)</string>
+    <string name="bmi_height_in">in</string>
+    <string name="bmi_weight_kg">Weight (kg)</string>
+    <string name="bmi_weight_lb">Weight (lb)</string>
+    <string name="bmi_result">Your BMI</string>
+    <string name="bmi_underweight">Underweight</string>
+    <string name="bmi_normal">Normal</string>
+    <string name="bmi_overweight">Overweight</string>
+    <string name="bmi_obese">Obese</string>
+    <string name="bmi_asian_cutoffs">Asian cut-offs</string>
+    <string name="bmi_healthy_range">Healthy weight for your height: %1$s – %2$s kg</string>
+    <string name="bmi_disclaimer">For general information only, not medical advice.</string>
+
+    <!-- Discount -->
+    <string name="discount_title">Discount</string>
+    <string name="discount_original_price">Original price</string>
+    <string name="discount_percent">Discount %%</string>
+    <string name="discount_extra_percent">Extra discount %%</string>
+    <string name="discount_tax_percent">Tax %%</string>
+    <string name="discount_final_price">Final price</string>
+    <string name="discount_you_save">You save</string>
+    <string name="discount_effective">Effective discount</string>
+    <string name="discount_reverse">Reverse (find original price)</string>
+
+    <!-- Finance -->
+    <string name="finance_title">Finance</string>
+    <string name="finance_gst">GST</string>
+    <string name="finance_currency">Currency</string>
+    <string name="finance_investment">Investment</string>
+    <string name="finance_loan">Loan</string>
+
+    <!-- GST -->
+    <string name="gst_title">GST Calculator</string>
+    <string name="gst_add">Add GST</string>
+    <string name="gst_remove">Remove GST</string>
+    <string name="gst_amount">Amount</string>
+    <string name="gst_rate">GST Rate %%</string>
+    <string name="gst_custom">Custom</string>
+    <string name="gst_value">GST amount</string>
+    <string name="gst_total">Total</string>
+    <string name="gst_base">Base amount</string>
+    <string name="gst_cgst">CGST</string>
+    <string name="gst_sgst">SGST</string>
+    <string name="gst_igst_toggle">IGST (single tax)</string>
+    <string name="gst_igst">IGST</string>
+    <string name="gst_disclaimer">GST slabs are set by the GST Council and can change.</string>
+
+    <!-- Currency -->
+    <string name="currency_title">Currency</string>
+    <string name="currency_search_hint">Search currency…</string>
+    <string name="currency_offline">Rates updated %s (offline)</string>
+    <string name="currency_updated">Rates updated %s</string>
+    <string name="currency_no_data">No rates available</string>
+    <string name="currency_retry">Check connection and retry</string>
+    <string name="currency_attribution">Exchange rates from open.er-api.com</string>
+    <string name="currency_attribution_fallback">Exchange rates from frankfurter.dev (ECB)</string>
+
+    <!-- Investment -->
+    <string name="investment_title">Investment</string>
+    <string name="investment_sip">SIP</string>
+    <string name="investment_lumpsum">Lump sum</string>
+    <string name="investment_fd">FD</string>
+    <string name="investment_monthly_amount">Monthly amount</string>
+    <string name="investment_principal">Principal amount</string>
+    <string name="investment_return_rate">Expected return %% p.a.</string>
+    <string name="investment_years">Time period (years)</string>
+    <string name="investment_stepup">Annual step-up %%</string>
+    <string name="investment_compounding">Compounding</string>
+    <string name="investment_compound_monthly">Monthly</string>
+    <string name="investment_compound_quarterly">Quarterly</string>
+    <string name="investment_compound_halfyearly">Half-yearly</string>
+    <string name="investment_compound_yearly">Yearly</string>
+    <string name="investment_invested">Invested amount</string>
+    <string name="investment_returns">Estimated returns</string>
+    <string name="investment_total">Total value</string>
+    <string name="investment_effective_yield">Effective annual yield</string>
+    <string name="investment_disclaimer">Estimates only. Not financial advice.</string>
+
+    <!-- Loan -->
+    <string name="loan_title">Loan / EMI</string>
+    <string name="loan_amount">Loan amount</string>
+    <string name="loan_interest">Interest rate %% p.a.</string>
+    <string name="loan_tenure">Tenure</string>
+    <string name="loan_tenure_years">Years</string>
+    <string name="loan_tenure_months">Months</string>
+    <string name="loan_emi">Monthly EMI</string>
+    <string name="loan_total_interest">Total interest</string>
+    <string name="loan_total_payment">Total payment</string>
+    <string name="loan_amortization">Amortization schedule</string>
+    <string name="loan_amortization_title">Amortization</string>
+    <string name="loan_view_monthly">Monthly</string>
+    <string name="loan_view_yearly">Yearly</string>
+    <string name="loan_col_month">Month</string>
+    <string name="loan_col_emi">EMI</string>
+    <string name="loan_col_principal">Principal</string>
+    <string name="loan_col_interest">Interest</string>
+    <string name="loan_col_balance">Balance</string>
+    <string name="loan_col_year">Year</string>
+
+    <!-- One-handed mode -->
+    <string name="one_handed_mode">One-handed mode</string>
+    <string name="one_handed_expand">Exit one-handed mode</string>
+
+    <!-- Generic -->
+    <string name="back">Back</string>
+    <string name="close">Close</string>
+    <string name="select_unit">Select unit</string>
+    <string name="all_units">All units</string>
+    <string name="tap_to_copy">Tap to copy</string>
+    <string name="principal">Principal</string>
+    <string name="interest">Interest</string>
+</resources>
