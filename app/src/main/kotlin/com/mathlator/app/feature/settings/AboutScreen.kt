@@ -63,7 +63,7 @@ fun AboutScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            MathlatorLogo(size = 28.dp)
+            MathlatorLogo(size = 38.dp)
 
             Spacer(Modifier.height(32.dp))
 

@@ -224,10 +224,16 @@ object TacticalIcons {
         viewportSize = 24f,
         strokeWidth = 2.0f,
         paths = listOf(
-            "M 9.5 6 A 2.5 2.5 0 1 0 14.5 6 A 2.5 2.5 0 1 0 9.5 6 Z",
-            "M 5 15 H 8 A 1 1 0 0 1 9 16 V 19 A 1 1 0 0 1 8 20 H 5 A 1 1 0 0 1 4 19 V 16 A 1 1 0 0 1 5 15 Z",
-            "M 16 15 H 19 A 1 1 0 0 1 20 16 V 19 A 1 1 0 0 1 19 20 H 16 A 1 1 0 0 1 15 19 V 16 A 1 1 0 0 1 16 15 Z",
-            "M 12 8.5 V 12 M 6.5 15 V 12 H 17.5 V 15"
+            // Top cylindrical disc cap (ellipse)
+            "M 3.5 5.5 C 3.5 3.95 7.3 2.7 12 2.7 C 16.7 2.7 20.5 3.95 20.5 5.5 C 20.5 7.05 16.7 8.3 12 8.3 C 7.3 8.3 3.5 7.05 3.5 5.5 Z",
+            // Middle tier shelf
+            "M 3.5 11.5 C 3.5 13.05 7.3 14.3 12 14.3 C 16.7 14.3 20.5 13.05 20.5 11.5",
+            // Outer hull rails and bottom curved base
+            "M 3.5 5.5 V 17.5 C 3.5 19.05 7.3 20.3 12 20.3 C 16.7 20.3 20.5 19.05 20.5 17.5 V 5.5"
+        ),
+        fillPaths = listOf(
+            // Subtle glowing sheen on top storage disc
+            "M 3.5 5.5 C 3.5 3.95 7.3 2.7 12 2.7 C 16.7 2.7 20.5 3.95 20.5 5.5 C 20.5 7.05 16.7 8.3 12 8.3 C 7.3 8.3 3.5 7.05 3.5 5.5 Z"
         )
     )
 

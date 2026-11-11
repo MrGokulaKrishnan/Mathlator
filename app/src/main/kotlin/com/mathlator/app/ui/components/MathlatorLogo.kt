@@ -17,11 +17,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mathlator.app.ui.theme.WordmarkTextStyle
 
+/**
+ * Reusable Mathlator brand logo: two horizontal orange-gradient bars with the
+ * white wordmark MATHLATOR centered between them.
+ */
 @Composable
-fun MathlatorLogo(modifier: Modifier = Modifier, size: Dp = 24.dp) {
+fun MathlatorLogo(modifier: Modifier = Modifier, size: Dp = 28.dp) {
     val barBrush = brandGradientBrush()
-    val barWidth = size * 5.8f
-    val barHeight = size
+    val barWidth = size * 6.0f
+    val barHeight = size * 1.05f
 
     Column(
         modifier = modifier,
@@ -33,17 +37,17 @@ fun MathlatorLogo(modifier: Modifier = Modifier, size: Dp = 24.dp) {
             drawRoundRect(
                 brush = barBrush,
                 size = this.size,
-                cornerRadius = CornerRadius(4.dp.toPx()),
+                cornerRadius = CornerRadius(barHeight.toPx() * 0.28f),
             )
         }
 
         // "MATHLATOR" wordmark
         Text(
             text = "MATHLATOR",
-            style = WordmarkTextStyle.copy(fontSize = (size.value * 0.8f).sp),
+            style = WordmarkTextStyle.copy(fontSize = (size.value * 0.88f).sp),
             color = Color.White,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(vertical = size * 0.5f),
+            modifier = Modifier.padding(vertical = size * 0.45f),
         )
 
         // Bottom bar
@@ -51,7 +55,7 @@ fun MathlatorLogo(modifier: Modifier = Modifier, size: Dp = 24.dp) {
             drawRoundRect(
                 brush = barBrush,
                 size = this.size,
-                cornerRadius = CornerRadius(4.dp.toPx()),
+                cornerRadius = CornerRadius(barHeight.toPx() * 0.28f),
             )
         }
     }
