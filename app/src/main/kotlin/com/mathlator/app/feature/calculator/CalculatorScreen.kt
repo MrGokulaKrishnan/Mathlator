@@ -23,7 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.mathlator.app.core.engine.AngleMode
 import com.mathlator.app.data.prefs.SettingsRepository
+import com.mathlator.app.ui.components.TacticalCalculatorKeypad
 import com.mathlator.app.ui.theme.MathlatorTheme
 import com.mathlator.app.ui.theme.mathlatorColors
 
@@ -88,6 +90,7 @@ fun CalculatorContent(
                         isError = state.isError,
                         errorMessage = state.errorMessage,
                         onBackspace = onDelete,
+                        angleMode = if (state.angleMode == AngleMode.DEG) "DEG" else "RAD",
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(0.35f),
@@ -108,13 +111,12 @@ fun CalculatorContent(
                                 .fillMaxHeight()
                                 .padding(end = 8.dp),
                         )
-                        Keypad(
+                        TacticalCalculatorKeypad(
                             onKey = onKey,
                             onDelete = onDelete,
                             onClear = onClear,
                             onModeToggle = onModeToggle,
                             isScientificActive = state.isScientific,
-                            hapticsEnabled = haptics,
                             modifier = Modifier
                                 .weight(0.5f)
                                 .fillMaxHeight(),
@@ -142,6 +144,7 @@ fun CalculatorContent(
                             isError = state.isError,
                             errorMessage = state.errorMessage,
                             onBackspace = onDelete,
+                            angleMode = if (state.angleMode == AngleMode.DEG) "DEG" else "RAD",
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
@@ -174,13 +177,12 @@ fun CalculatorContent(
                             Alignment.BottomCenter
                         },
                     ) {
-                        Keypad(
+                        TacticalCalculatorKeypad(
                             onKey = onKey,
                             onDelete = onDelete,
                             onClear = onClear,
                             onModeToggle = onModeToggle,
                             isScientificActive = state.isScientific,
-                            hapticsEnabled = haptics,
                             modifier = if (isOneHanded) {
                                 Modifier.fillMaxWidth(0.82f)
                             } else {

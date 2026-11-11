@@ -6,9 +6,10 @@ import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,20 +31,13 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
-import androidx.compose.material.icons.outlined.SwapVert
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -60,14 +55,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mathlator.app.ui.components.NumericKeypad
-import com.mathlator.app.ui.components.brandGradientBrush
-import com.mathlator.app.ui.theme.Primary
+import androidx.compose.ui.zIndex
+import com.mathlator.app.ui.components.TacticalConverterKeypad
+import com.mathlator.app.ui.components.TacticalIcons
+import com.mathlator.app.ui.components.tacticalExtrudedKeycap
+import com.mathlator.app.ui.components.tacticalRecessedWell
+import com.mathlator.app.ui.components.tacticalSocket
+import com.mathlator.app.ui.theme.TacticalColors
+import com.mathlator.app.ui.theme.TacticalDimens
+import com.mathlator.app.ui.theme.TacticalTypography
 import com.mathlator.app.ui.theme.TitleTextStyle
-import com.mathlator.app.ui.theme.mathlatorColors
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,7 +78,6 @@ fun UnitConverterScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colors = mathlatorColors
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -93,9 +93,15 @@ fun UnitConverterScreen(
         label = "SwapRotation",
     )
 
+    fun copyToClipboard(valueToCopy: String) {
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("Converted Value", valueToCopy))
+        scope.launch { snackbarHostState.showSnackbar("Copied $valueToCopy") }
+    }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = colors.background,
+        containerColor = TacticalColors.ObsidianChassis,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
@@ -103,7 +109,7 @@ fun UnitConverterScreen(
                     Text(
                         text = state.category.name,
                         style = TitleTextStyle,
-                        color = colors.textMain,
+                        color = TacticalColors.TextPrimary,
                     )
                 },
                 navigationIcon = {
@@ -111,11 +117,11 @@ fun UnitConverterScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = "Back",
-                            tint = colors.textMain,
+                            tint = TacticalColors.TextPrimary,
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = TacticalColors.ObsidianChassis),
             )
         },
     ) { innerPadding ->
@@ -124,144 +130,185 @@ fun UnitConverterScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 8.dp),
+                .padding(horizontal = 16.dp, vertical = 6.dp),
         ) {
-            // Data converter: Decimal / Binary toggle
+            // Data converter: Neumorphic Segmented Toggle
             if (state.category == ConverterCategory.Data) {
-                Row(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    horizontalArrangement = Arrangement.Center,
+                        .padding(bottom = 10.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    FilterChip(
-                        selected = !state.isBinaryData,
-                        onClick = { viewModel.toggleBinaryData(false) },
-                        label = { Text("Decimal (1000ⁿ)") },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = Primary,
-                            selectedLabelColor = Color.White,
-                        ),
-                    )
-                    Spacer(Modifier.width(12.dp))
-                    FilterChip(
-                        selected = state.isBinaryData,
-                        onClick = { viewModel.toggleBinaryData(true) },
-                        label = { Text("Binary (1024ⁿ)") },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = Primary,
-                            selectedLabelColor = Color.White,
-                        ),
-                    )
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(TacticalColors.SurfaceDock)
+                            .padding(3.dp),
+                    ) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            SegmentedDataToggleItem(
+                                label = "Decimal (1000ⁿ)",
+                                isSelected = !state.isBinaryData,
+                                onClick = { viewModel.toggleBinaryData(false) },
+                            )
+                            SegmentedDataToggleItem(
+                                label = "Binary (1024ⁿ)",
+                                isSelected = state.isBinaryData,
+                                onClick = { viewModel.toggleBinaryData(true) },
+                            )
+                        }
+                    }
                 }
             }
 
-            // FROM Card
-            UnitCard(
-                label = "FROM",
-                value = state.fromValue,
-                unitSymbol = if (state.category == ConverterCategory.Temperature) state.fromTemp.symbol else state.fromUnit.symbol,
-                unitName = if (state.category == ConverterCategory.Temperature) state.fromTemp.name else state.fromUnit.nameResKey,
-                isActive = state.activeCard == ActiveInputCard.FROM,
-                onClick = { viewModel.setActiveCard(ActiveInputCard.FROM) },
-                onUnitClick = { showFromPicker = true },
-            )
+            // Dual I/O Wells with Floating 3D Swap Orb overlapping the gap
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    // FROM Card
+                    TacticalUnitCard(
+                        label = "FROM",
+                        value = state.fromValue,
+                        unitSymbol = if (state.category == ConverterCategory.Temperature) state.fromTemp.symbol else state.fromUnit.symbol,
+                        unitName = if (state.category == ConverterCategory.Temperature) state.fromTemp.name else state.fromUnit.nameResKey,
+                        isFocused = state.activeCard == ActiveInputCard.FROM,
+                        onClick = { viewModel.setActiveCard(ActiveInputCard.FROM) },
+                        onUnitClick = { showFromPicker = true },
+                    )
 
-            // Circular Swap Button (44dp, gradient, 180° rotation)
+                    Spacer(Modifier.height(14.dp))
+
+                    // TO Card
+                    TacticalUnitCard(
+                        label = "TO",
+                        value = state.toValue,
+                        unitSymbol = if (state.category == ConverterCategory.Temperature) state.toTemp.symbol else state.toUnit.symbol,
+                        unitName = if (state.category == ConverterCategory.Temperature) state.toTemp.name else state.toUnit.nameResKey,
+                        isFocused = state.activeCard == ActiveInputCard.TO,
+                        onClick = { viewModel.setActiveCard(ActiveInputCard.TO) },
+                        onUnitClick = { showToPicker = true },
+                    )
+                }
+
+                // Floating 3D Center Swap Orb (zIndex = 2f, positioned in gap)
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .zIndex(2f),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    val swapSource = remember { MutableInteractionSource() }
+                    val swapPressed by swapSource.collectIsPressedAsState()
+
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .rotate(animatedRotation)
+                            .tacticalExtrudedKeycap(
+                                cornerRadius = 22.dp,
+                                isPressed = swapPressed,
+                                isAccent = true,
+                            )
+                            .background(TacticalColors.KeycapEqualsBase)
+                            .clickable(
+                                interactionSource = swapSource,
+                                indication = null,
+                                onClick = {
+                                    rotationAngle += 180f
+                                    viewModel.swapUnits()
+                                }
+                            ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector = TacticalIcons.Swap,
+                            contentDescription = "Swap units",
+                            tint = Color.White,
+                            modifier = Modifier.size(22.dp),
+                        )
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(14.dp))
+
+            // Expandable "All units" Live Drawer
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                contentAlignment = Alignment.Center,
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(TacticalColors.SurfaceSocket)
+                    .clickable { viewModel.toggleAllUnitsExpanded() }
+                    .padding(horizontal = 14.dp, vertical = 10.dp),
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .rotate(animatedRotation)
-                        .clip(CircleShape)
-                        .background(brandGradientBrush())
-                        .clickable {
-                            rotationAngle += 180f
-                            viewModel.swapUnits()
-                        },
-                    contentAlignment = Alignment.Center,
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    Text(
+                        text = "All units preview (${state.allUnitsValues.size})",
+                        style = TacticalTypography.TelemetryLabel.copy(color = TacticalColors.TacticalOrange),
+                    )
                     Icon(
-                        imageVector = Icons.Outlined.SwapVert,
-                        contentDescription = "Swap units",
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp),
+                        imageVector = if (state.isAllUnitsExpanded) Icons.Outlined.KeyboardArrowUp else Icons.Outlined.KeyboardArrowDown,
+                        contentDescription = null,
+                        tint = TacticalColors.TacticalOrange,
+                        modifier = Modifier.size(20.dp),
                     )
                 }
-            }
-
-            // TO Card
-            UnitCard(
-                label = "TO",
-                value = state.toValue,
-                unitSymbol = if (state.category == ConverterCategory.Temperature) state.toTemp.symbol else state.toUnit.symbol,
-                unitName = if (state.category == ConverterCategory.Temperature) state.toTemp.name else state.toUnit.nameResKey,
-                isActive = state.activeCard == ActiveInputCard.TO,
-                onClick = { viewModel.setActiveCard(ActiveInputCard.TO) },
-                onUnitClick = { showToPicker = true },
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            // Expandable "All units" list
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { viewModel.toggleAllUnitsExpanded() }
-                    .padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text("All units", color = colors.textDim, fontSize = 14.sp)
-                Icon(
-                    imageVector = if (state.isAllUnitsExpanded) Icons.Outlined.KeyboardArrowUp else Icons.Outlined.KeyboardArrowDown,
-                    contentDescription = null,
-                    tint = colors.textDim,
-                )
             }
 
             AnimatedVisibility(visible = state.isAllUnitsExpanded) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 12.dp)
+                        .padding(top = 6.dp, bottom = 12.dp)
                 ) {
                     state.allUnitsValues.forEach { row ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {
-                                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                    clipboard.setPrimaryClip(ClipData.newPlainText("Unit Value", row.value))
-                                    scope.launch { snackbarHostState.showSnackbar("Copied ${row.value}") }
-                                }
-                                .padding(vertical = 8.dp),
+                                .clickable { copyToClipboard(row.value) }
+                                .padding(horizontal = 12.dp, vertical = 10.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Text(row.unit.nameResKey, color = colors.textDim, fontSize = 14.sp)
-                            Text("${row.value} ${row.unit.symbol}", color = colors.textMain, fontSize = 14.sp)
+                            Text(row.unit.nameResKey, color = TacticalColors.TextSecondary, fontSize = 13.sp)
+                            Text(
+                                text = "${row.value} ${row.unit.symbol}",
+                                color = TacticalColors.TextPrimary,
+                                fontSize = 14.sp,
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = FontWeight.SemiBold,
+                            )
                         }
-                        HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
+                        HorizontalDivider(color = Color(0x14FFFFFF), thickness = 0.5.dp)
                     }
                 }
             }
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(14.dp))
 
-            // Numeric Keypad
-            NumericKeypad(
+            // ── Uniform 4×4 Tactical Converter Keypad ────────────────────────
+            TacticalConverterKeypad(
                 onDigit = { viewModel.onDigit(it) },
                 onDecimal = { viewModel.onDecimal() },
-                onSign = { viewModel.onSign() },
                 onDelete = { viewModel.onDelete() },
                 onClear = { viewModel.onClear() },
+                onSwap = {
+                    rotationAngle += 180f
+                    viewModel.swapUnits()
+                },
+                onCopy = {
+                    val activeVal = if (state.activeCard == ActiveInputCard.FROM) state.toValue else state.fromValue
+                    copyToClipboard(activeVal.ifEmpty { "0" })
+                },
+                onSign = { viewModel.onSign() },
                 showSign = state.category == ConverterCategory.Temperature,
             )
+
+            Spacer(Modifier.height(16.dp))
         }
 
         // Unit picker bottom sheets
@@ -302,70 +349,95 @@ fun UnitConverterScreen(
 }
 
 @Composable
-private fun UnitCard(
+private fun TacticalUnitCard(
     label: String,
     value: String,
     unitSymbol: String,
     unitName: String,
-    isActive: Boolean,
+    isFocused: Boolean,
     onClick: () -> Unit,
     onUnitClick: () -> Unit,
 ) {
-    val colors = mathlatorColors
-
-    Card(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = colors.surface),
-        border = if (isActive) BorderStroke(1.5.dp, brush = brandGradientBrush()) else BorderStroke(1.dp, colors.divider),
+            .tacticalRecessedWell(
+                cornerRadius = TacticalDimens.WellCornerRadius,
+                isFocused = isFocused,
+            )
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 14.dp),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(label, color = colors.textDim, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = label,
+                style = TacticalTypography.TelemetryMicroBadge.copy(
+                    color = if (isFocused) TacticalColors.TacticalOrange else TacticalColors.TextMuted,
+                ),
+            )
+
+            Spacer(Modifier.height(4.dp))
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = value.ifEmpty { "0" },
-                    color = colors.textMain,
-                    fontSize = 40.sp,
-                    fontWeight = FontWeight.Light,
+                    style = TacticalTypography.OledReadoutMedium.copy(
+                        fontSize = 32.sp,
+                        color = if (isFocused) TacticalColors.TextPrimary else TacticalColors.TextSecondary,
+                    ),
                     maxLines = 1,
                     modifier = Modifier.weight(1f),
                 )
 
-                // Unit Chip
-                Surface(
-                    onClick = onUnitClick,
-                    shape = RoundedCornerShape(12.dp),
-                    color = colors.surfaceHigh,
-                    modifier = Modifier.padding(start = 8.dp),
+                // Tactical Unit Selector Pill
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(TacticalColors.KeycapUtilBase)
+                        .clickable(onClick = onUnitClick)
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
                 ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "$unitName ($unitSymbol)",
-                            color = colors.textMain,
+                            text = "$unitSymbol ▾",
+                            color = TacticalColors.TacticalOrange,
                             fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                        )
-                        Icon(
-                            imageVector = Icons.Outlined.ArrowDropDown,
-                            contentDescription = null,
-                            tint = colors.textDim,
+                            fontWeight = FontWeight.Bold,
                         )
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun SegmentedDataToggleItem(
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(10.dp))
+            .then(
+                if (isSelected) Modifier.background(TacticalColors.KeycapEqualsBase)
+                else Modifier
+            )
+            .clickable(onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 6.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = label,
+            color = if (isSelected) Color.White else TacticalColors.TextSecondary,
+            fontSize = 12.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+        )
     }
 }
 
@@ -376,14 +448,13 @@ private fun TemperaturePickerSheet(
     onSelect: (TempUnit) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val colors = mathlatorColors
     androidx.compose.material3.ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = colors.surface,
+        containerColor = TacticalColors.SurfaceCard,
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
-            Text("Select temperature unit", color = colors.textMain, fontSize = 18.sp, fontWeight = FontWeight.Medium)
-            Spacer(Modifier.height(12.dp))
+            Text("Select temperature unit", color = TacticalColors.TextPrimary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(14.dp))
             TempUnit.entries.forEach { temp ->
                 Row(
                     modifier = Modifier
@@ -395,10 +466,15 @@ private fun TemperaturePickerSheet(
                         .padding(vertical = 12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text(temp.name, color = if (selected == temp) Primary else colors.textMain, fontSize = 16.sp)
-                    Text(temp.symbol, color = colors.textDim, fontSize = 14.sp)
+                    Text(
+                        text = temp.name,
+                        color = if (selected == temp) TacticalColors.TacticalOrange else TacticalColors.TextPrimary,
+                        fontSize = 16.sp,
+                        fontWeight = if (selected == temp) FontWeight.Bold else FontWeight.Normal,
+                    )
+                    Text(temp.symbol, color = TacticalColors.TextSecondary, fontSize = 14.sp)
                 }
-                HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
+                HorizontalDivider(color = Color(0x14FFFFFF), thickness = 0.5.dp)
             }
         }
     }

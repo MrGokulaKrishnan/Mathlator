@@ -41,14 +41,17 @@ val LocalMathlatorColors = staticCompositionLocalOf {
 }
 
 fun darkMathlatorColors() = MathlatorColors(
-    background  = BackgroundDark,
-    surface     = SurfaceDark,
-    surfaceHigh = SurfaceHighDark,
-    divider     = DividerDark,
-    operator    = OperatorDark,
-    textMain    = TextMainDark,
-    textDim     = TextDimDark,
+    background  = TacticalColors.ObsidianChassis,
+    surface     = TacticalColors.SurfaceRecessedWell,
+    surfaceHigh = TacticalColors.SurfaceCard,
+    divider     = Color(0x14FFFFFF),
+    operator    = TacticalColors.TacticalOrange,
+    textMain    = TacticalColors.TextPrimary,
+    textDim     = TacticalColors.TextSecondary,
     error       = ErrorDark,
+    primary     = TacticalColors.TacticalOrange,
+    brandStart  = TacticalColors.TacticalOrange,
+    brandEnd    = TacticalColors.TacticalAmber,
     isDark      = true,
 )
 

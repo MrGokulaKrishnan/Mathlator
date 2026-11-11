@@ -1,8 +1,17 @@
 package com.mathlator.app.feature.finance.currency
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,16 +22,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.SwapVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -34,7 +42,8 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -44,28 +53,55 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mathlator.app.ui.components.NumericKeypad
-import com.mathlator.app.ui.components.brandGradientBrush
-import com.mathlator.app.ui.theme.BrandEnd
-import com.mathlator.app.ui.theme.BrandStart
+import com.mathlator.app.ui.components.TacticalConverterKeypad
+import com.mathlator.app.ui.components.TacticalIcons
+import com.mathlator.app.ui.components.tacticalCard
+import com.mathlator.app.ui.components.tacticalExtrudedKeycap
+import com.mathlator.app.ui.components.tacticalRecessedWell
+import com.mathlator.app.ui.components.tacticalSocket
 import com.mathlator.app.ui.theme.MathlatorTheme
-import com.mathlator.app.ui.theme.Primary
+import com.mathlator.app.ui.theme.TacticalColors
+import com.mathlator.app.ui.theme.TacticalDimens
+import com.mathlator.app.ui.theme.TacticalTypography
 import com.mathlator.app.ui.theme.TitleTextStyle
-import com.mathlator.app.ui.theme.mathlatorColors
+import kotlinx.coroutines.launch
 
+fun flagForCurrency(code: String): String {
+    val country = when (code) {
+        "EUR" -> "EU"
+        "USD" -> "US"
+        "GBP" -> "GB"
+        "INR" -> "IN"
+        "AED" -> "AE"
+        "JPY" -> "JP"
+        "AUD" -> "AU"
+        "CAD" -> "CA"
+        "CHF" -> "CH"
+        "CNY" -> "CN"
+        "SGD" -> "SG"
+        else -> if (code.length >= 2) code.take(2) else ""
+    }
+    return if (country.length == 2) {
+        val f = Character.codePointAt(country, 0) - 0x41 + 0x1F1E6
+        val s = Character.codePointAt(country, 1) - 0x41 + 0x1F1E6
+        String(Character.toChars(f)) + String(Character.toChars(s))
+    } else "🌐"
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CurrencyScreen(
     viewModel: CurrencyViewModel,
@@ -73,103 +109,51 @@ fun CurrencyScreen(
     modifier: Modifier = Modifier,
 ) {
     val state by viewModel.uiState.collectAsState()
-    val screenHeightDp = LocalConfiguration.current.screenHeightDp
-
-    // Which picker is showing
     var activePicker by remember { mutableStateOf<PickerTarget?>(null) }
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
-    // Adapt card height for shorter screens (< 700dp)
-    val isCompact = screenHeightDp < 700
-    val cardHeight = if (isCompact) 80.dp else 96.dp
-    val amountFontSize = if (isCompact) 32.sp else 36.sp
-
-    CurrencyScreenContent(
-        state = state,
-        isCompact = isCompact,
-        cardHeight = cardHeight,
-        amountFontSize = amountFontSize,
-        onNavigateBack = onNavigateBack,
-        onRefresh = { viewModel.loadRates(force = true) },
-        onPromote = { viewModel.promoteToMain(it) },
-        onCurrencyClick = { activePicker = it },
-        onDigit = { viewModel.onDigit(it) },
-        onDecimal = { viewModel.onDecimal() },
-        onDelete = { viewModel.onDelete() },
-        onClear = { viewModel.onClear() },
-        modifier = modifier,
-    )
-
-    // ── Currency Picker Sheet ─────────────────────────────────────────────────
-    activePicker?.let { target ->
-        val selectedCode = when (target) {
-            PickerTarget.MAIN -> state.mainCode
-            PickerTarget.OUT1 -> state.out1Code
-            PickerTarget.OUT2 -> state.out2Code
-        }
-        CurrencyPickerSheet(
-            currencies = viewModel.currencyList,
-            selectedCode = selectedCode,
-            onSelect = {
-                viewModel.setCurrency(target, it.code)
-                activePicker = null
-            },
-            onDismiss = { activePicker = null },
-        )
+    fun copyAmount(value: String) {
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("Currency Amount", value))
+        scope.launch { snackbarHostState.showSnackbar("Copied $value") }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CurrencyScreenContent(
-    state: CurrencyUiState,
-    isCompact: Boolean,
-    cardHeight: Dp,
-    amountFontSize: TextUnit,
-    onNavigateBack: () -> Unit,
-    onRefresh: () -> Unit,
-    onPromote: (PickerTarget) -> Unit,
-    onCurrencyClick: (PickerTarget) -> Unit,
-    onDigit: (String) -> Unit,
-    onDecimal: () -> Unit,
-    onDelete: () -> Unit,
-    onClear: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val colors = mathlatorColors
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = colors.background,
+        containerColor = TacticalColors.ObsidianChassis,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Currency", style = TitleTextStyle, color = colors.textMain) },
+                title = { Text("Multi-Currency Rack", style = TitleTextStyle, color = TacticalColors.TextPrimary) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = "Back",
-                            tint = colors.textMain,
+                            tint = TacticalColors.TextPrimary,
                         )
                     }
                 },
                 actions = {
-                    IconButton(onClick = onRefresh) {
+                    IconButton(onClick = { viewModel.loadRates(force = true) }) {
                         if (state.isLoading) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(20.dp),
-                                color = Primary,
+                                color = TacticalColors.TacticalOrange,
                                 strokeWidth = 2.dp,
                             )
                         } else {
                             Icon(
                                 Icons.Outlined.Refresh,
                                 contentDescription = "Refresh rates",
-                                tint = colors.textMain,
+                                tint = TacticalColors.TextPrimary,
                             )
                         }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = TacticalColors.ObsidianChassis),
             )
         },
     ) { innerPadding ->
@@ -181,11 +165,11 @@ fun CurrencyScreenContent(
                 contentAlignment = Alignment.Center,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("No exchange rates available", color = colors.textMain, fontSize = 16.sp)
+                    Text("No exchange rates available", color = TacticalColors.TextPrimary, fontSize = 16.sp)
                     Spacer(Modifier.height(12.dp))
                     Button(
-                        onClick = onRefresh,
-                        colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                        onClick = { viewModel.loadRates(force = true) },
+                        colors = ButtonDefaults.buttonColors(containerColor = TacticalColors.TacticalOrange),
                     ) {
                         Text("Retry", color = Color.White)
                     }
@@ -196,111 +180,177 @@ fun CurrencyScreenContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .padding(horizontal = 20.dp),
+                    .padding(horizontal = 16.dp),
             ) {
-                // Rates status line
-                Text(
-                    text = state.lastUpdatedText,
-                    color = if (state.isOffline) colors.operator else colors.textDim,
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(vertical = 6.dp),
-                )
-
-                // ── Card 1: MAIN ─────────────────────────────────────────────
-                MainCurrencyCard(
-                    amount = state.mainValue,
-                    currencyCode = state.mainCode,
-                    cardHeight = cardHeight.value.toInt(),
-                    amountFontSize = amountFontSize.value.toInt(),
-                    onCurrencyClick = { onCurrencyClick(PickerTarget.MAIN) },
+                // ── Live Sync Header ─────────────────────────────────────────
+                LiveSyncHeader(
+                    timestampText = state.lastUpdatedText,
+                    attributionText = state.attributionText,
+                    isOffline = state.isOffline,
+                    isLoading = state.isLoading,
+                    onRefresh = { viewModel.loadRates(force = true) },
                 )
 
                 Spacer(Modifier.height(10.dp))
 
-                // ── Card 2: OUTPUT 1 ─────────────────────────────────────────
-                ConvertedCurrencyCard(
-                    label = "CONVERTED",
+                // ── 3-Slot Currency Rack ─────────────────────────────────────
+                // Slot 1: MAIN BASE (Highlighted with #FF5E00 border glow)
+                MainRackSlot(
+                    amount = state.mainValue,
+                    currencyCode = state.mainCode,
+                    onCurrencyClick = { activePicker = PickerTarget.MAIN },
+                )
+
+                Spacer(Modifier.height(10.dp))
+
+                // Slot 2: CONVERTED TARGET 1
+                TargetRackSlot(
+                    targetLabel = "TARGET 1",
                     amount = state.out1Value.ifEmpty { "—" },
                     currencyCode = state.out1Code,
                     rateCaption = state.out1Rate,
-                    cardHeight = cardHeight.value.toInt(),
-                    amountFontSize = amountFontSize.value.toInt(),
-                    onCurrencyClick = { onCurrencyClick(PickerTarget.OUT1) },
-                    onPromote = { onPromote(PickerTarget.OUT1) },
+                    onCurrencyClick = { activePicker = PickerTarget.OUT1 },
+                    onPromote = { viewModel.promoteToMain(PickerTarget.OUT1) },
                 )
 
                 Spacer(Modifier.height(10.dp))
 
-                // ── Card 3: OUTPUT 2 ─────────────────────────────────────────
-                ConvertedCurrencyCard(
-                    label = "CONVERTED",
+                // Slot 3: CONVERTED TARGET 2
+                TargetRackSlot(
+                    targetLabel = "TARGET 2",
                     amount = state.out2Value.ifEmpty { "—" },
                     currencyCode = state.out2Code,
                     rateCaption = state.out2Rate,
-                    cardHeight = cardHeight.value.toInt(),
-                    amountFontSize = amountFontSize.value.toInt(),
-                    onCurrencyClick = { onCurrencyClick(PickerTarget.OUT2) },
-                    onPromote = { onPromote(PickerTarget.OUT2) },
+                    onCurrencyClick = { activePicker = PickerTarget.OUT2 },
+                    onPromote = { viewModel.promoteToMain(PickerTarget.OUT2) },
                 )
 
-                // Push keypad to bottom
                 Spacer(Modifier.weight(1f))
 
-                // ── Keypad (Bug 3 layout with tall ⌫ and C, no empty cells) ─
-                NumericKeypad(
-                    onDigit = onDigit,
-                    onDecimal = onDecimal,
-                    onSign = {},
-                    onDelete = onDelete,
-                    onClear = onClear,
+                // ── Bottom Keypad: TacticalConverterKeypad ────────────────────
+                TacticalConverterKeypad(
+                    onDigit = { viewModel.onDigit(it) },
+                    onDecimal = { viewModel.onDecimal() },
+                    onDelete = { viewModel.onDelete() },
+                    onClear = { viewModel.onClear() },
+                    onSwap = { viewModel.promoteToMain(PickerTarget.OUT1) },
+                    onCopy = { copyAmount(state.out1Value.ifEmpty { state.mainValue }) },
                     showDecimal = true,
-                    showSign = false,
                 )
 
-                Spacer(Modifier.height(6.dp))
-
-                // Attribution footer
-                Text(
-                    text = state.attributionText,
-                    color = colors.textDim,
-                    fontSize = 12.sp,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(bottom = 8.dp),
-                )
+                Spacer(Modifier.height(12.dp))
             }
+        }
+
+        // ── Currency Picker Sheet ─────────────────────────────────────────────
+        activePicker?.let { target ->
+            val selectedCode = when (target) {
+                PickerTarget.MAIN -> state.mainCode
+                PickerTarget.OUT1 -> state.out1Code
+                PickerTarget.OUT2 -> state.out2Code
+            }
+            CurrencyPickerSheet(
+                currencies = viewModel.currencyList,
+                selectedCode = selectedCode,
+                onSelect = {
+                    viewModel.setCurrency(target, it.code)
+                    activePicker = null
+                },
+                onDismiss = { activePicker = null },
+            )
         }
     }
 }
 
 @Composable
-private fun MainCurrencyCard(
+private fun LiveSyncHeader(
+    timestampText: String,
+    attributionText: String,
+    isOffline: Boolean,
+    isLoading: Boolean,
+    onRefresh: () -> Unit,
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "PulseTransition")
+    val pulseAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.35f,
+        targetValue = 1.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(900),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "PulseAlpha",
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.weight(1f),
+        ) {
+            // Pulsing emerald status dot
+            Box(
+                modifier = Modifier
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (isOffline) TacticalColors.TacticalAmber
+                        else TacticalColors.EmeraldTelemetry.copy(alpha = pulseAlpha)
+                    )
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = "$timestampText • $attributionText",
+                color = if (isOffline) TacticalColors.TacticalAmber else TacticalColors.TextSecondary,
+                fontSize = 11.sp,
+                fontFamily = FontFamily.Monospace,
+                maxLines = 1,
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+                .tacticalSocket(cornerRadius = 8.dp)
+                .clickable(onClick = onRefresh),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Refresh,
+                contentDescription = "Sync",
+                tint = TacticalColors.TacticalOrange,
+                modifier = Modifier.size(16.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun MainRackSlot(
     amount: String,
     currencyCode: String,
-    cardHeight: Int,
-    amountFontSize: Int,
     onCurrencyClick: () -> Unit,
 ) {
-    val colors = mathlatorColors
-    val gradientBorder = Brush.linearGradient(listOf(BrandStart, BrandEnd))
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(cardHeight.dp)
-            .clip(RoundedCornerShape(20.dp))
-            .border(1.5.dp, gradientBorder, RoundedCornerShape(20.dp))
-            .background(colors.surface, RoundedCornerShape(20.dp))
+            .height(88.dp)
+            .tacticalRecessedWell(
+                cornerRadius = TacticalDimens.WellCornerRadius,
+                isFocused = true,
+            )
             .padding(horizontal = 16.dp, vertical = 10.dp),
     ) {
-        Column {
+        Column(modifier = Modifier.fillMaxWidth()) {
             Text(
-                "MAIN",
-                color = colors.textDim,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = 0.08.sp,
+                text = "MAIN BASE // LIVE INPUT",
+                style = TacticalTypography.TelemetryMicroBadge,
             )
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -308,48 +358,43 @@ private fun MainCurrencyCard(
             ) {
                 Text(
                     text = amount.ifEmpty { "0" },
-                    color = colors.textMain,
-                    fontSize = amountFontSize.sp,
-                    fontWeight = FontWeight.Light,
+                    style = TacticalTypography.OledReadoutMedium.copy(
+                        fontSize = 32.sp,
+                        color = TacticalColors.TextPrimary,
+                    ),
                     maxLines = 1,
                     modifier = Modifier.weight(1f),
                 )
-                CurrencyChip(code = currencyCode, onClick = onCurrencyClick)
+
+                CurrencySelectorPill(code = currencyCode, onClick = onCurrencyClick)
             }
         }
     }
 }
 
 @Composable
-private fun ConvertedCurrencyCard(
-    label: String,
+private fun TargetRackSlot(
+    targetLabel: String,
     amount: String,
     currencyCode: String,
     rateCaption: String,
-    cardHeight: Int,
-    amountFontSize: Int,
     onCurrencyClick: () -> Unit,
     onPromote: () -> Unit,
 ) {
-    val colors = mathlatorColors
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(cardHeight.dp)
-            .clip(RoundedCornerShape(20.dp))
-            .background(colors.surface)
-            .clickable { onPromote() }
+            .height(88.dp)
+            .tacticalCard(cornerRadius = TacticalDimens.CardCornerRadius)
+            .clickable(onClick = onPromote)
             .padding(horizontal = 16.dp, vertical = 10.dp),
     ) {
-        Column {
+        Column(modifier = Modifier.fillMaxWidth()) {
             Text(
-                label,
-                color = colors.textDim,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = 0.08.sp,
+                text = targetLabel,
+                style = TacticalTypography.TelemetryLabel.copy(fontSize = 10.sp),
             )
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -358,39 +403,47 @@ private fun ConvertedCurrencyCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = amount,
-                        color = colors.textMain,
-                        fontSize = amountFontSize.sp,
-                        fontWeight = FontWeight.Light,
+                        style = TacticalTypography.OledReadoutMedium.copy(
+                            fontSize = 28.sp,
+                            color = TacticalColors.TextPrimary,
+                        ),
                         maxLines = 1,
                     )
                     if (rateCaption.isNotEmpty()) {
                         Text(
                             text = rateCaption,
-                            color = colors.textDim,
-                            fontSize = 12.sp,
+                            color = TacticalColors.TextSecondary,
+                            fontSize = 11.sp,
+                            fontFamily = FontFamily.Monospace,
                         )
                     }
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    // Promote-to-main swap button (40dp)
+                    // Tactile Promote Button [ ⇅ ]
                     Box(
                         modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(brandGradientBrush())
-                            .clickable { onPromote() },
+                            .size(36.dp)
+                            .tacticalExtrudedKeycap(
+                                cornerRadius = 10.dp,
+                                isPressed = false,
+                                isAccent = true,
+                            )
+                            .background(TacticalColors.KeycapEqualsBase)
+                            .clickable(onClick = onPromote),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.SwapVert,
-                            contentDescription = "Make main",
+                            imageVector = TacticalIcons.Swap,
+                            contentDescription = "Promote to main",
                             tint = Color.White,
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(18.dp),
                         )
                     }
-                    Spacer(Modifier.size(8.dp))
-                    CurrencyChip(code = currencyCode, onClick = onCurrencyClick)
+
+                    Spacer(Modifier.width(8.dp))
+
+                    CurrencySelectorPill(code = currencyCode, onClick = onCurrencyClick)
                 }
             }
         }
@@ -398,28 +451,23 @@ private fun ConvertedCurrencyCard(
 }
 
 @Composable
-private fun CurrencyChip(code: String, onClick: () -> Unit) {
-    val colors = mathlatorColors
-    Surface(
-        onClick = onClick,
-        shape = RoundedCornerShape(12.dp),
-        color = colors.surfaceHigh,
+private fun CurrencySelectorPill(code: String, onClick: () -> Unit) {
+    val flag = flagForCurrency(code)
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(TacticalColors.KeycapUtilBase)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 10.dp, vertical = 6.dp),
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text = flag, fontSize = 16.sp)
+            Spacer(Modifier.width(6.dp))
             Text(
-                text = code,
-                color = colors.textMain,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium,
-            )
-            Icon(
-                imageVector = Icons.Outlined.ArrowDropDown,
-                contentDescription = "Change currency",
-                tint = colors.textDim,
-                modifier = Modifier.size(18.dp),
+                text = "$code ▾",
+                color = TacticalColors.TacticalOrange,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
             )
         }
     }
@@ -433,7 +481,6 @@ private fun CurrencyPickerSheet(
     onSelect: (CurrencyItem) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val colors = mathlatorColors
     var search by remember { mutableStateOf("") }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -448,7 +495,7 @@ private fun CurrencyPickerSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = colors.surface,
+        containerColor = TacticalColors.SurfaceCard,
     ) {
         Column(
             modifier = Modifier
@@ -456,28 +503,31 @@ private fun CurrencyPickerSheet(
                 .padding(horizontal = 20.dp, vertical = 8.dp),
         ) {
             Text(
-                "Select currency",
-                color = colors.textMain,
+                text = "Select Currency",
+                color = TacticalColors.TextPrimary,
                 fontSize = 18.sp,
-                fontWeight = FontWeight.Medium,
+                fontWeight = FontWeight.Bold,
             )
+
             Spacer(Modifier.height(12.dp))
 
             OutlinedTextField(
                 value = search,
                 onValueChange = { search = it },
-                placeholder = { Text("Search currency…", color = colors.textDim) },
+                placeholder = { Text("Search currency…", color = TacticalColors.TextMuted) },
                 leadingIcon = {
-                    Icon(Icons.Outlined.Search, contentDescription = null, tint = colors.textDim)
+                    Icon(Icons.Outlined.Search, contentDescription = null, tint = TacticalColors.TacticalOrange)
                 },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Primary,
-                    cursorColor = Primary,
-                    unfocusedBorderColor = colors.divider,
-                    focusedContainerColor = colors.surfaceHigh,
-                    unfocusedContainerColor = colors.surfaceHigh,
+                    focusedBorderColor = TacticalColors.TacticalOrange,
+                    cursorColor = TacticalColors.TacticalOrange,
+                    unfocusedBorderColor = Color(0x1FFFFFFF),
+                    focusedContainerColor = TacticalColors.SurfaceSocket,
+                    unfocusedContainerColor = TacticalColors.SurfaceSocket,
+                    focusedTextColor = TacticalColors.TextPrimary,
+                    unfocusedTextColor = TacticalColors.TextPrimary,
                 ),
                 shape = RoundedCornerShape(12.dp),
             )
@@ -486,6 +536,7 @@ private fun CurrencyPickerSheet(
 
             LazyColumn(modifier = Modifier.fillMaxWidth().height(360.dp)) {
                 items(filtered, key = { it.code }) { item ->
+                    val isSelected = item.code == selectedCode
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -495,143 +546,22 @@ private fun CurrencyPickerSheet(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(item.flagEmoji, fontSize = 24.sp)
-                            Spacer(Modifier.size(12.dp))
+                            Text(item.flagEmoji, fontSize = 22.sp)
+                            Spacer(Modifier.width(12.dp))
                             Column {
                                 Text(
                                     item.code,
-                                    color = if (item.code == selectedCode) Primary else colors.textMain,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Medium,
+                                    color = if (isSelected) TacticalColors.TacticalOrange else TacticalColors.TextPrimary,
+                                    fontSize = 15.sp,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                                 )
-                                Text(item.name, color = colors.textDim, fontSize = 12.sp)
+                                Text(item.name, color = TacticalColors.TextSecondary, fontSize = 12.sp)
                             }
                         }
                     }
-                    HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
+                    HorizontalDivider(color = Color(0x14FFFFFF), thickness = 0.5.dp)
                 }
             }
         }
-    }
-}
-
-// ── Previews ─────────────────────────────────────────────────────────────────
-
-@Preview(name = "Currency Pixel Portrait Dark", device = "id:pixel_7", showSystemUi = true)
-@Composable
-private fun CurrencyPreviewPixel() {
-    MathlatorTheme(isDark = true) {
-        CurrencyScreenContent(
-            state = CurrencyUiState(
-                mainCode = "INR",
-                out1Code = "USD",
-                out2Code = "EUR",
-                mainValue = "900",
-                out1Value = "10",
-                out2Value = "9",
-                out1Rate = "1 INR = 0.0111 USD",
-                out2Rate = "1 INR = 0.0100 EUR",
-                lastUpdatedText = "Rates updated just now",
-            ),
-            isCompact = false,
-            cardHeight = 96.dp,
-            amountFontSize = 36.sp,
-            onNavigateBack = {},
-            onRefresh = {},
-            onPromote = {},
-            onCurrencyClick = {},
-            onDigit = {},
-            onDecimal = {},
-            onDelete = {},
-            onClear = {},
-        )
-    }
-}
-
-@Preview(name = "Currency Small Phone 360x640", widthDp = 360, heightDp = 640)
-@Composable
-private fun CurrencyPreviewSmall() {
-    MathlatorTheme(isDark = true) {
-        CurrencyScreenContent(
-            state = CurrencyUiState(
-                mainCode = "INR",
-                out1Code = "USD",
-                out2Code = "EUR",
-                mainValue = "100",
-                out1Value = "1.11",
-                out2Value = "1.00",
-                lastUpdatedText = "Rates updated just now",
-            ),
-            isCompact = true,
-            cardHeight = 80.dp,
-            amountFontSize = 32.sp,
-            onNavigateBack = {},
-            onRefresh = {},
-            onPromote = {},
-            onCurrencyClick = {},
-            onDigit = {},
-            onDecimal = {},
-            onDelete = {},
-            onClear = {},
-        )
-    }
-}
-
-@Preview(name = "Currency Font Scale 1.3", fontScale = 1.3f)
-@Composable
-private fun CurrencyPreviewLargeFont() {
-    MathlatorTheme(isDark = true) {
-        CurrencyScreenContent(
-            state = CurrencyUiState(
-                mainCode = "USD",
-                out1Code = "EUR",
-                out2Code = "GBP",
-                mainValue = "50",
-                out1Value = "45",
-                out2Value = "38.5",
-                lastUpdatedText = "Rates updated 2h ago (offline)",
-                isOffline = true,
-            ),
-            isCompact = false,
-            cardHeight = 96.dp,
-            amountFontSize = 36.sp,
-            onNavigateBack = {},
-            onRefresh = {},
-            onPromote = {},
-            onCurrencyClick = {},
-            onDigit = {},
-            onDecimal = {},
-            onDelete = {},
-            onClear = {},
-        )
-    }
-}
-
-@Preview(name = "Currency Light Theme")
-@Composable
-private fun CurrencyPreviewLight() {
-    MathlatorTheme(isDark = false) {
-        CurrencyScreenContent(
-            state = CurrencyUiState(
-                mainCode = "INR",
-                out1Code = "USD",
-                out2Code = "EUR",
-                mainValue = "1000",
-                out1Value = "11.11",
-                out2Value = "10.00",
-                lastUpdatedText = "Rates updated just now",
-            ),
-            isCompact = false,
-            cardHeight = 96.dp,
-            amountFontSize = 36.sp,
-            onNavigateBack = {},
-            onRefresh = {},
-            onPromote = {},
-            onCurrencyClick = {},
-            onDigit = {},
-            onDecimal = {},
-            onDelete = {},
-            onClear = {},
-        )
     }
 }

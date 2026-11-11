@@ -9,29 +9,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccessTime
-import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.Category
-import androidx.compose.material.icons.outlined.CropFree
-import androidx.compose.material.icons.outlined.Dashboard
-import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.DeviceHub
-import androidx.compose.material.icons.outlined.Discount
-import androidx.compose.material.icons.outlined.FitnessCenter
-import androidx.compose.material.icons.outlined.Numbers
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Scale
-import androidx.compose.material.icons.outlined.Speed
-import androidx.compose.material.icons.outlined.Straighten
-import androidx.compose.material.icons.outlined.Thermostat
-import androidx.compose.material.icons.outlined.ViewInAr
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
@@ -45,13 +29,17 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mathlator.app.ui.components.TacticalIcons
+import com.mathlator.app.ui.components.tacticalCard
+import com.mathlator.app.ui.components.tacticalSocket
 import com.mathlator.app.ui.navigation.Screen
-import com.mathlator.app.ui.theme.GridLabelTextStyle
-import com.mathlator.app.ui.theme.Primary
-import com.mathlator.app.ui.theme.mathlatorColors
+import com.mathlator.app.ui.theme.TacticalColors
+import com.mathlator.app.ui.theme.TacticalDimens
+import com.mathlator.app.ui.theme.TacticalTypography
 
-data class ConverterToolItem(
+data class BentoToolItem(
     val title: String,
+    val subtitle: String,
     val icon: ImageVector,
     val route: String,
 )
@@ -61,68 +49,87 @@ fun ConvertersScreen(
     onNavigateToRoute: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colors = mathlatorColors
-
     // Strict order per Section 7:
     // Age, Area, BMI, Data, Date, Discount, Length, Mass, Numeral system, Speed, Temperature, Time, Volume
     val tools = listOf(
-        ConverterToolItem("Age", Icons.Outlined.Person, Screen.AgeConverter.route),
-        ConverterToolItem("Area", Icons.Outlined.CropFree, Screen.UnitConverter.route("area")),
-        ConverterToolItem("BMI", Icons.Outlined.FitnessCenter, Screen.BmiConverter.route),
-        ConverterToolItem("Data", Icons.Outlined.DeviceHub, Screen.UnitConverter.route("data")),
-        ConverterToolItem("Date", Icons.Outlined.CalendarMonth, Screen.DateConverter.route),
-        ConverterToolItem("Discount", Icons.Outlined.Discount, Screen.DiscountConverter.route),
-        ConverterToolItem("Length", Icons.Outlined.Straighten, Screen.UnitConverter.route("length")),
-        ConverterToolItem("Mass", Icons.Outlined.Scale, Screen.UnitConverter.route("mass")),
-        ConverterToolItem("Numeral system", Icons.Outlined.Numbers, Screen.NumeralConverter.route),
-        ConverterToolItem("Speed", Icons.Outlined.Speed, Screen.UnitConverter.route("speed")),
-        ConverterToolItem("Temperature", Icons.Outlined.Thermostat, Screen.UnitConverter.route("temperature")),
-        ConverterToolItem("Time", Icons.Outlined.AccessTime, Screen.UnitConverter.route("time")),
-        ConverterToolItem("Volume", Icons.Outlined.ViewInAr, Screen.UnitConverter.route("volume")),
+        BentoToolItem("Age", "yr • mo • day", TacticalIcons.Age, Screen.AgeConverter.route),
+        BentoToolItem("Area", "m² • ac • ha", TacticalIcons.Area, Screen.UnitConverter.route("area")),
+        BentoToolItem("BMI", "kg/m² • index", TacticalIcons.Bmi, Screen.BmiConverter.route),
+        BentoToolItem("Data", "MB • GiB • TB", TacticalIcons.Data, Screen.UnitConverter.route("data")),
+        BentoToolItem("Date", "diff • add/sub", TacticalIcons.Date, Screen.DateConverter.route),
+        BentoToolItem("Discount", "off • tax", TacticalIcons.Discount, Screen.DiscountConverter.route),
+        BentoToolItem("Length", "m • ft • in", TacticalIcons.Length, Screen.UnitConverter.route("length")),
+        BentoToolItem("Mass", "kg • lb • oz", TacticalIcons.Mass, Screen.UnitConverter.route("mass")),
+        BentoToolItem("Numeral", "HEX • DEC", TacticalIcons.Numeral, Screen.NumeralConverter.route),
+        BentoToolItem("Speed", "km/h • mph", TacticalIcons.Speed, Screen.UnitConverter.route("speed")),
+        BentoToolItem("Temperature", "°C • °F • K", TacticalIcons.Temperature, Screen.UnitConverter.route("temperature")),
+        BentoToolItem("Time", "hr • min • s", TacticalIcons.Time, Screen.UnitConverter.route("time")),
+        BentoToolItem("Volume", "L • gal • m³", TacticalIcons.Volume, Screen.UnitConverter.route("volume")),
     )
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+        contentPadding = PaddingValues(top = 8.dp, bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(TacticalDimens.BentoCardSpacing),
+        horizontalArrangement = Arrangement.spacedBy(TacticalDimens.BentoCardSpacing),
     ) {
         items(tools, key = { it.title }) { item ->
             val interactionSource = remember { MutableInteractionSource() }
             val isPressed by interactionSource.collectIsPressedAsState()
 
-            val activeColor = if (isPressed) Primary else colors.textDim
-            val labelColor = if (isPressed) Primary else colors.textMain
-
             Box(
                 modifier = Modifier
-                    .height(120.dp)
+                    .height(118.dp)
+                    .tacticalCard(
+                        cornerRadius = TacticalDimens.CardCornerRadius,
+                        isPressed = isPressed,
+                    )
                     .clickable(
                         interactionSource = interactionSource,
                         indication = ripple(bounded = true, radius = 48.dp),
                         onClick = { onNavigateToRoute(item.route) },
                     )
-                    .semantics { contentDescription = item.title },
+                    .padding(horizontal = 8.dp, vertical = 10.dp)
+                    .semantics { contentDescription = "${item.title} converter" },
                 contentAlignment = Alignment.Center,
             ) {
                 Column(
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
-                    Icon(
-                        imageVector = item.icon,
-                        contentDescription = null,
-                        tint = activeColor,
-                        modifier = Modifier.size(32.dp),
-                    )
-                    Spacer(Modifier.height(12.dp))
+                    // Etched Icon Socket
+                    Box(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .tacticalSocket(cornerRadius = 12.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector = item.icon,
+                            contentDescription = null,
+                            tint = TacticalColors.TacticalOrange,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+
+                    Spacer(Modifier.height(8.dp))
+
                     Text(
                         text = item.title,
-                        style = GridLabelTextStyle.copy(fontSize = 15.sp),
-                        color = labelColor,
+                        style = TacticalTypography.BentoTitle,
+                        maxLines = 1,
+                    )
+
+                    Spacer(Modifier.height(2.dp))
+
+                    Text(
+                        text = item.subtitle,
+                        style = TacticalTypography.BentoSubtitle,
+                        maxLines = 1,
                     )
                 }
             }

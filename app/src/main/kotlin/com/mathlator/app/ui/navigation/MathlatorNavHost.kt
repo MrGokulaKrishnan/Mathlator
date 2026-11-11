@@ -10,6 +10,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -95,8 +96,12 @@ import com.mathlator.app.feature.history.HistoryViewModel
 import com.mathlator.app.feature.settings.AboutScreen
 import com.mathlator.app.feature.settings.SettingsScreen
 import com.mathlator.app.feature.settings.SettingsViewModel
+import com.mathlator.app.ui.components.TacticalIcons
 import com.mathlator.app.ui.components.brandGradientBrush
+import com.mathlator.app.ui.components.tacticalExtrudedKeycap
 import com.mathlator.app.ui.theme.Primary
+import com.mathlator.app.ui.theme.TacticalColors
+import com.mathlator.app.ui.theme.TacticalDimens
 import com.mathlator.app.ui.theme.mathlatorColors
 import kotlinx.coroutines.launch
 
@@ -298,32 +303,37 @@ private fun MainTabShell(
                 }
             }
 
-            // Centre: three tab icons, evenly spaced
-            Row(
-                modifier = Modifier.weight(1f),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
+            // Centre: Recessed Neumorphic Segmented Dock (#0D0F14)
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(TacticalDimens.DockCornerRadius))
+                    .background(TacticalColors.SurfaceDock)
+                    .padding(3.dp),
+                contentAlignment = Alignment.Center,
             ) {
-                TabIconItem(
-                    icon = Icons.Outlined.Calculate,
-                    contentDescription = "Calculator",
-                    isSelected = pagerState.currentPage == 0,
-                    onClick = { scope.launch { pagerState.animateScrollToPage(0) } },
-                )
-                Spacer(Modifier.padding(horizontal = 16.dp))
-                TabIconItem(
-                    icon = Icons.Outlined.GridView,
-                    contentDescription = "Converters",
-                    isSelected = pagerState.currentPage == 1,
-                    onClick = { scope.launch { pagerState.animateScrollToPage(1) } },
-                )
-                Spacer(Modifier.padding(horizontal = 16.dp))
-                TabIconItem(
-                    icon = Icons.Outlined.CurrencyExchange,
-                    contentDescription = "Finance",
-                    isSelected = pagerState.currentPage == 2,
-                    onClick = { scope.launch { pagerState.animateScrollToPage(2) } },
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    SegmentedDockTab(
+                        icon = TacticalIcons.Calculator,
+                        contentDescription = "Calculator",
+                        isSelected = pagerState.currentPage == 0,
+                        onClick = { scope.launch { pagerState.animateScrollToPage(0) } },
+                    )
+                    SegmentedDockTab(
+                        icon = TacticalIcons.BentoGrid,
+                        contentDescription = "Converters",
+                        isSelected = pagerState.currentPage == 1,
+                        onClick = { scope.launch { pagerState.animateScrollToPage(1) } },
+                    )
+                    SegmentedDockTab(
+                        icon = TacticalIcons.FinanceHub,
+                        contentDescription = "Finance",
+                        isSelected = pagerState.currentPage == 2,
+                        onClick = { scope.launch { pagerState.animateScrollToPage(2) } },
+                    )
+                }
             }
 
             // Right: overflow menu
@@ -380,28 +390,35 @@ private fun MainTabShell(
 }
 
 @Composable
-private fun TabIconItem(
+private fun SegmentedDockTab(
     icon: ImageVector,
     contentDescription: String,
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
-    val colors = mathlatorColors
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
     Box(
         modifier = Modifier
-            .size(44.dp)
+            .size(width = 54.dp, height = 38.dp)
             .clip(RoundedCornerShape(12.dp))
             .then(
                 if (isSelected) {
-                    Modifier.background(brandGradientBrush(), RoundedCornerShape(12.dp))
-                } else {
                     Modifier
+                        .tacticalExtrudedKeycap(
+                            cornerRadius = 12.dp,
+                            isPressed = isPressed,
+                            isAccent = true,
+                        )
+                        .background(TacticalColors.KeycapEqualsBase)
+                } else {
+                    Modifier.clickable(
+                        interactionSource = interactionSource,
+                        indication = ripple(bounded = true, radius = 24.dp),
+                        onClick = onClick,
+                    )
                 }
-            )
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = ripple(bounded = true, radius = 22.dp),
-                onClick = onClick,
             )
             .semantics { this.contentDescription = contentDescription },
         contentAlignment = Alignment.Center,
@@ -409,8 +426,8 @@ private fun TabIconItem(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = if (isSelected) Color.White else colors.textDim,
-            modifier = Modifier.size(28.dp),
+            tint = if (isSelected) Color.White else TacticalColors.TextSecondary,
+            modifier = Modifier.size(20.dp),
         )
     }
 }
