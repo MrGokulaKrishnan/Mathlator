@@ -1,142 +1,209 @@
 # Mathlator
 
-A calculator with 13 converters and 4 finance tools for Android, styled in pure black with an orange gradient accent.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/MrGokulaKrishnan/Mathlator/main/art/mathlator_banner.png" alt="Mathlator Banner" width="400" onerror="this.style.display='none'"/>
+</p>
+
+<p align="center">
+  <strong>High-Precision Android Calculator, Unit Converter & Finance Instrument</strong><br/>
+  <em>Engineered in a bespoke Neumorphic Tactical Dark hardware aesthetic with pure black and vibrant orange accents.</em>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Kotlin-2.1.20-7F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white" alt="Kotlin 2.1.20" />
+  <img src="https://img.shields.io/badge/Android-SDK%2026%2B%20%7C%20Target%2035-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white" alt="Android SDK" />
+  <img src="https://img.shields.io/badge/Jetpack%20Compose-BOM%202025.05.00-4285F4.svg?style=for-the-badge&logo=jetpackcompose&logoColor=white" alt="Compose BOM" />
+  <img src="https://img.shields.io/badge/Architecture-Clean%20%2B%20MVVM-FF5E00.svg?style=for-the-badge" alt="Clean Architecture" />
+  <img src="https://img.shields.io/badge/Offline--First-100%25%20Private-10B981.svg?style=for-the-badge" alt="Offline First" />
+  <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=for-the-badge" alt="License" />
+</p>
 
 ---
 
-## 1. Tech Stack & Architecture
+## 📌 Overview
 
-- **Language:** Kotlin 2.1.20 (minSdk 26, targetSdk 35, compileSdk 36)
-- **UI:** Jetpack Compose (BOM 2025.05.00) + Material 3, Navigation Compose
-- **Architecture:** Clean Architecture + MVVM + StateFlow + Hilt
-- **Local Storage:** Room 2.7.1 (KSP) + DataStore Preferences
-- **Networking:** Retrofit 2.11.0 + OkHttp + kotlinx.serialization
-- **Coroutines:** KotlinX Coroutines Android
-- **Splash:** AndroidX Core SplashScreen with custom animated vector
+**Mathlator** (`com.mathlator.app`) is a flagship, offline-first Android calculation workstation combining a scientific calculator, 13 physical converters, specialized biometrics/chrono tools, and 4 comprehensive finance instruments into a single cohesive app.
+
+Built entirely from scratch in modern **Kotlin** and **Jetpack Compose**, Mathlator rejects generic flat designs in favor of a tactile **"Neumorphic Tactical Dark"** hardware instrument aesthetic: sunken OLED telemetry displays, extruded dual-shadow physical keycaps, glowing neon focus states, and seamless edge-to-edge system bars.
 
 ---
 
-## 2. Project Layout
+## ⚡ Core Capabilities
+
+### 1. 🧮 Advanced Scientific Calculator
+- **Recursive Descent Math Engine:** Custom zero-dependency tokenizer and parser supporting operator precedence (`^` right-associativity binding tighter than unary minus: `-2^2 = -4`, `2^3^2 = 512`), implicit multiplication (`2(3) = 6`), nested parentheses, and auto-closing brackets for real-time live result previews.
+- **Scientific Ribbon `f(x)`:** Expandable function panel offering trigonometry (`sin`, `cos`, `tan`), hyperbolic functions (`sinh`, `cosh`, `tanh`), inverse functions, logarithms (`ln`, `log10`), powers, roots, constants ($\pi$, $e$), and angle switching (`DEG` / `RAD`).
+- **OLED Telemetry Display:** High-contrast recessed readout with micro telemetry badge (`CALC // DEG`), auto-scaling tabular figures (`tnum`), swipe-to-backspace gesture, and haptic feedback.
+- **5×4 Ergonomic Keypad:** High-depth extruded keycaps with tactile dual-shadow physics and physical 0.96× depression scaling on press.
+
+### 2. 📐 13 Precision Converters + Specialized Tools
+Presented in an interactive 3-column Neumorphic Bento Grid with etched sockets:
+- **Length, Mass, Temperature, Speed, Volume, Area, Time, Data Storage, Fuel Economy, Pressure, Energy, Power, Angle.**
+- **Dual Recessed I/O Wells:** Dual input/output cards with active orange glowing focus rings, floating center 3D swap orb, and expandable all-units drawer.
+- **Uniform 4×4 Tactical Converter Keypad:** Dedicated hardware layout (`[7, 8, 9, ⌫]`, `[4, 5, 6, C]`, `[1, 2, 3, ⇅]`, `[., 0, 00, 📋]`) with zero empty dead cells.
+- **Specialized Instruments:**
+  - **Age Chrono Telemetry:** Dual date selection wells, hero telemetry card with glowing left accent bar, 2×2 bento breakdown (Years, Months, Weeks, Days, Hours), and animated next-birthday countdown bar.
+  - **Biometric BMI Spectrum:** Metric/Imperial units segmented toggle, dual height/weight stepper cards, Asian WHO cutoffs switch, and 4-zone biometric arc gauge with animated needle.
+  - **Numeral Systems:** Real-time conversion across Hexadecimal, Decimal, Octal, and Binary.
+  - **Discount Calculator:** Quick calculations for original price, discount percentage, extra tax, and final savings.
+  - **Date Difference:** Exact duration between two calendar dates in days, weeks, and months.
+
+### 3. 📈 4 Finance Instruments
+- **Currency 3-Slot Rack:**
+  - Active MAIN input slot + 2 read-only target conversion slots with live rate captions.
+  - Quick-promote `⇅` button to instantly swap any target currency to MAIN.
+  - Resilient dual-source networking: `open.er-api.com` (primary, zero API key) with automatic fallback to `api.frankfurter.dev`.
+  - Offline Room database caching with 12-hour TTL and live sync telemetry header.
+- **Quick GST Split Module:**
+  - Embedded interactive tool on the Finance Hub with tactile slab selector pills (`0%`, `5%`, `12%`, `18%`, `28%`).
+  - Real-time split breakdown of Net Base, CGST, SGST, and Gross Total.
+  - Supports both **Add GST** and **Remove GST** calculations.
+- **Investment Calculators:**
+  - **SIP Calculator:** Monthly systematic investment plans with compounding returns.
+  - **Lump Sum & Fixed Deposit (FD):** Wealth projection over customizable tenures.
+- **Loan & EMI Calculator:**
+  - Monthly payment calculation, total interest payable, and overall loan repayment breakdown.
+
+---
+
+## 🎨 Neumorphic Tactical Dark Design System
+
+Mathlator features a bespoke hardware instrument appearance powered by custom Jetpack Compose Canvas modifiers:
+
+| Token | Hex / Spec | Description |
+|---|---|---|
+| `ObsidianChassis` | `#08090C` | Root matte chassis background |
+| `SurfaceRecessedWell` | `#0B0D12` | Sunken telemetry readouts and input wells |
+| `SurfaceRecessedWellActive`| `#0E1017` | Focused input cavity background |
+| `SurfaceCard` | `#11141B` | Elevated Neumorphic Bento tiles |
+| `KeycapNumBase` | `#151821` | Physical numeric keycap fill |
+| `KeycapOpBase` | `#1E2330` | Arithmetic operator keycap fill |
+| `KeycapUtilBase` | `#13161F` | Utility keycap fill (`C`, `⌫`, `⇅`, `📋`) |
+| `TacticalOrange` | `#FF5E00` | Primary hardware indicator & action accent |
+| `TacticalAmber` | `#FF9E00` | Secondary gradient accent & warning highlight |
+| `EmeraldTelemetry` | `#10B981` | Real-time network sync indicator & success state |
+
+### Hardware Canvas Engine (`TacticalModifiers.kt`)
+- `Modifier.tacticalExtrudedKeycap`: Dual-offset shadows (bottom-right `+5dp, +6dp` shadow with `12dp` blur, top-left `-3dp, -3dp` ambient highlight with `8dp` blur, specular border stroke, inner recessed shadow on touch, and 0.96× scale depression).
+- `Modifier.tacticalRecessedWell`: Sunken display simulation with dark inner corner gradients and glowing `1.5dp` `#FF5E00` outline on focus.
+- `Modifier.tacticalCard` & `Modifier.tacticalSocket`: Extruded Bento cards and etched recessed icon sockets.
+
+---
+
+## 🏛️ Architecture & Tech Stack
+
+Mathlator is engineered strictly according to **Clean Architecture** and **Modern Android Architecture (MVVM + UDF)**:
 
 ```
 com.mathlator.app
-├── MainActivity.kt · MathlatorApp.kt (Hilt Application)
+├── MainActivity.kt               # Edge-to-edge container, theme-aware system bars
+├── MathlatorApp.kt               # Dagger-Hilt application entry point
 ├── core/
-│   ├── engine/       Tokenizer, Evaluator, Calculator, AngleMode, EvalResult
-│   ├── format/       NumberFormatter, DigitGrouping
-│   └── finance/      CurrencyCalculator, GstCalculator, EmiCalculator, SipCalculator, LumpSumCalculator, FdCalculator, DiscountCalculator
+│   ├── engine/                   # Pure Kotlin math engine (Tokenizer, Parser, Evaluator)
+│   ├── format/                   # NumberFormatter (Indian & International digit grouping)
+│   └── finance/                  # Financial math engines (GST, EMI, SIP, FD, Currency)
 ├── data/
-│   ├── db/           AppDatabase, HistoryDao, HistoryEntity, RateDao, RateSnapshotEntity
-│   ├── prefs/        SettingsRepository (DataStore Preferences)
-│   └── rates/        RateProvider, OpenErApiProvider, FrankfurterProvider, RatesRepository
+│   ├── db/                       # Room 2.7.1 Database, HistoryDao, RateDao, Entities
+│   ├── prefs/                    # SettingsRepository (Jetpack DataStore Preferences)
+│   └── rates/                    # Retrofit 2.11 + OkHttp currency rate providers & repo
 ├── feature/
-│   ├── calculator/   CalculatorScreen, CalculatorViewModel, Display, Keypad, SciPanel
-│   ├── converters/   ConvertersScreen, UnitConverterScreen, UnitConverterViewModel, ConverterCatalog,
-│   │                 UnitPickerSheet, numeral/, date/, age/, bmi/, discount/
-│   ├── finance/      FinanceScreen, gst/, currency/, investment/, loan/
-│   ├── history/      HistoryScreen, HistoryViewModel
-│   └── settings/     SettingsScreen, SettingsViewModel, AboutScreen
+│   ├── calculator/               # Scientific Calculator Screen, Keypad, SciPanel, ViewModel
+│   ├── converters/               # Bento Hub, UnitConverterScreen, AgeScreen, BmiScreen
+│   ├── finance/                  # Finance Hub, Quick GST, Currency 3-Slot Screen
+│   ├── history/                  # Calculation History Screen & ViewModel
+│   └── settings/                 # App Settings & About Screen
 └── ui/
-    ├── theme/        Color, Type, Shape, Theme
-    ├── components/   MathlatorLogo, ResultCard, NumericKeypad, DonutChart, LineChart, GradientUtils
-    └── navigation/   MathlatorNavHost, Screen
+    ├── theme/                    # TacticalColor, TacticalDesignSystem, Type, Theme
+    ├── components/               # TacticalModifiers, TacticalIcons, TacticalKeypads, ResultCard
+    └── navigation/               # MathlatorNavHost, Top Segmented Dock, Route Navigation
 ```
 
----
-
-## 3. Decisions Log
-
-1. **Pure Kotlin Core Engine:** All calculation engine components in `core/` have no Android dependencies, enabling fast and isolated unit testing.
-2. **Recursive Descent Parser:** Clean operator precedence (`^` right-associative, binding tighter than unary minus: `-2^2 = -4`, `2^3^2 = 512`), implicit multiplication (`2(3) = 6`), and auto-closing parentheses for live previews.
-3. **Currency Exchange Resilience:** Primary rates provider `open.er-api.com` with zero API key required, automatically falling back to `api.frankfurter.dev`. Rates are cached in Room with a 12-hour TTL and fallback to offline cached data with timestamp display.
-4. **Digit Grouping Formatter:** Formatter applies Indian (`12,34,567.89`) and International (`1,234,567.89`) formats purely at the display level; the internal calculation strings remain unformatted decimals.
-5. **Brand Gradient Tokens:** Defined in `Color.kt` and `GradientUtils.kt`. No dynamic/Material You tinting to ensure consistent brand identity.
-6. **Font Fallback:** System sans-serif with tabular figures (`tnum`) applied, ensuring perfect column alignment across digits.
-7. **Window Insets Architecture:** Single-point inset consumption via `WindowInsets.safeDrawing` on the root tab shell `Column`, with `android:windowLayoutInDisplayCutoutMode="shortEdges"` and `isNavigationBarContrastEnforced = false`. Child tool screens never suffer double-padding.
-8. **Weighted Calculator Layout:** Weighted heights eliminate empty dead bands between display and keypad across all screen aspect ratios (from 360×640 dp to tall 20:9 devices).
+### Technology Matrix
+- **Language & JVM:** Kotlin 2.1.20, Java 17 (`jvmTarget = "17"`), Java 8+ API desugaring (`desugar_jdk_libs:2.1.4`)
+- **Android Targets:** `compileSdk = 36`, `targetSdk = 35`, `minSdk = 26`
+- **UI Framework:** Jetpack Compose (BOM `2025.05.00`), Material 3, Navigation Compose `2.9.0`
+- **Dependency Injection:** Dagger Hilt `2.56` + `hilt-navigation-compose:1.2.0`
+- **Persistence:** Room `2.7.1` (KSP `2.1.20-1.0.32`), DataStore Preferences `1.1.4`
+- **Networking:** OkHttp `4.12.0`, Retrofit `2.11.0`, Kotlinx Serialization `1.8.1`
+- **Asynchrony:** KotlinX Coroutines `1.10.2` with `StateFlow` and `SharedFlow`
+- **Build System:** Gradle 8.11.1, Android Gradle Plugin 8.9.1, Gradle Version Catalog (`libs.versions.toml`)
 
 ---
 
-## 4. App Shell & Navigation (Section 4)
+## 🛡️ Privacy & Offline Guarantee
 
-- **Edge-to-Edge System Insets:** Consumed once at the root shell using `Modifier.windowInsetsPadding(WindowInsets.safeDrawing)`. Nested tool screens and Scaffolds do not double-pad.
-- **System Bar Icons:** Dynamically adapts based on the active theme: light status/navigation icons on pure black in Dark theme; dark icons in Light theme (`enableEdgeToEdge`).
-- **Cutout & Navigation Bar:** Configured with `android:windowLayoutInDisplayCutoutMode="shortEdges"` in `values-v28` and `window.isNavigationBarContrastEnforced = false` on API 29+ to keep 3-button and gesture navigation transparent.
-- **Top Bar (56dp):**
-  - Left slot: One-handed mode toggle with `contentDescription="One-handed mode"`.
-  - Center slot: Three 28dp tab icons with a 44dp orange gradient rounded-square pill behind the active tab icon, vertically centered in the 56dp bar.
-  - Right slot: Overflow menu (`⋮`) for History, Settings, About.
+- **Zero Ads & Zero Tracking:** No third-party SDKs, analytics, ads, accounts, or user profiling.
+- **Offline-First:** All mathematical calculations, unit conversions, age computations, and finance math execute 100% locally on the device CPU.
+- **Minimal Network Scope:** Network access is exclusively utilized by the Currency Converter to fetch exchange rates, cached locally for offline use.
 
 ---
 
-## 5. Calculator Screen & Keypad (Section 5)
+## 🚀 Building & Running
 
-- **Weighted Responsive Layout:**
-  - Normal mode: Display `weight(0.9f)` with bottom-aligned result (`contentAlignment = Alignment.BottomCenter`), 1dp divider directly above keypad, Keypad `weight(1.6f)`.
-  - Scientific mode: Display `weight(0.6f)`, collapsible Scientific Panel, Keypad `weight(1.6f)`.
-  - Keypad rows use equal weights (`1f` each), filling available screen height on all devices with zero dead space.
-- **Scientific Mode Toggle:** Bottom-left key displays `f(x)` text and highlights in `Primary` orange when active.
-- **Haptics & Gesture Backspace:** Haptic feedback on touch, horizontal drag gesture on display triggers backspace, long-press opens Copy/Share dialog.
+### Prerequisites
+- Android Studio Ladybug (2024.2+) or command-line Android SDK with SDK 36.
+- JDK 17 configured as `JAVA_HOME`.
 
----
+### 1. Build Debug APK & Automatic Stamping
+The included build script compiles the project, runs verification, copies the latest artifact to `dist/Mathlator-latest.apk`, and generates a stamped version tagged with the commit hash:
 
-## 6. Currency Converter (Section 8.2)
-
-- **Three-Currency Stack (1 Main + 2 Converted):**
-  - **Card 1 (MAIN):** Active input with 1.5dp brand-gradient outline, editable amount (36sp / 32sp on compact screens), and currency chip.
-  - **Card 2 (CONVERTED):** Read-only converted amount, currency chip, live rate caption (`1 INR = 0.0111 USD`), and 40dp swap/make-main button.
-  - **Card 3 (CONVERTED):** Second converted currency with rate caption and swap/make-main button.
-- **Make Main & Slot Swapping:** Tapping the swap button or card body promotes that converted card to MAIN. If a chosen currency in the picker is already active, the two slots swap instead of creating a duplicate.
-- **Clean 4-Column Keypad (Bug 3):**
-  ```
-  7   8   9   ⌫ (tall, rows 1–2)
-  4   5   6   ⌫
-  1   2   3   C (tall, rows 3–4)
-  .   0   00  C
-  ```
-  Zero empty cells. Keypad is bottom-anchored, followed by the attribution line (`Rates from open.er-api.com`).
-
----
-
-## 7. Settings & Persistence (Section 9)
-
-- **Default Currencies:** Three persistent slots (`currency_from`, `currency_to`, `currency_out2`) stored in DataStore.
-  - Default region detection: INR for India (`INR, USD, EUR`), region-based fallback (`USD, EUR, GBP` for US).
-  - Settings → Data → "Default currencies" displays and edits all three defaults via dialog.
-- **Settings Available:** Theme (Dark, Light, System), Haptic feedback, Key sound, Angle mode (DEG/RAD), Decimal precision (2–15), Digit grouping (Indian, International, None), Keep screen on, One-handed side (Left/Right), Clear history, Clear cached rates.
-
----
-
-## 8. Build & Run Instructions
-
-### Debug APK Build & Automated Stamping
+**Windows (PowerShell):**
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/build-apk.ps1
 ```
-Or on macOS/Linux:
+
+**macOS / Linux:**
 ```bash
 ./scripts/build-apk.sh
 ```
 
-### Verification (Tests & Lint)
+### 2. Install on Device via ADB
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts/verify.ps1
+adb install -r -d dist/Mathlator-latest.apk
+adb shell am start -n com.mathlator.app.debug/com.mathlator.app.MainActivity
 ```
 
-### Local Wi-Fi Device Download Server
+### 3. Local Wi-Fi Device Download Server
+Host the APK over your local Wi-Fi network so any phone on the same network can download and test it directly in browser:
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/build-apk.ps1 -Serve
 ```
 
+### 4. Run Test Suite & Lint Verification
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/verify.ps1
+```
+Or directly via Gradle:
+```bash
+./gradlew testDebugUnitTest lintDebug
+```
+
 ---
 
-## 9. QA Checklist
+## 📜 Key Architectural Decisions
 
-- [x] **Status Bar Insets (Bug 1):** Tab bar icons sit below status-bar clock/battery on gesture nav, 3-button nav, and punch-hole displays without overlap.
-- [x] **Calculator Dead Space (Bug 2):** Display is bottom-aligned above divider; keypad fills remaining height evenly on both small and tall phones.
-- [x] **Converter & Currency Keypad (Bug 3):** 4-column grid with tall `⌫` (rows 1–2) and tall `C` (rows 3–4); zero empty cells; attribution at bottom.
-- [x] **Currency Three-Card Layout:** Card 1 (MAIN, gradient outline), Cards 2 & 3 (CONVERTED with rate captions and 40dp make-main buttons).
-- [x] **Currency Make Main & Swapping:** Promotes converted currency to main with current value; selecting an active currency swaps slots.
-- [x] **Currency Persistence:** DataStore saves and restores `main`, `out1`, `out2`; default region currencies logic.
-- [x] **Scientific Toggle:** `f(x)` key highlights in Primary orange when active.
-- [x] **One-Handed Mode:** Content description "One-handed mode" on top-left icon.
+1. **Pure Kotlin Engine:** Core evaluation logic resides in `core/` with zero Android framework imports, enabling sub-second unit test execution.
+2. **Single-Point Inset Consumption:** Root tab layout consumes system window insets once via `Modifier.windowInsetsPadding(WindowInsets.safeDrawing)`, preventing double-padding on nested screens and Scaffolds.
+3. **Transparent System Bars:** Native edge-to-edge configuration with `android:windowLayoutInDisplayCutoutMode="shortEdges"` and dynamic status/nav icon coloring matching the active theme.
+4. **Digit Grouping Formatter:** Display-only digit grouping (Indian `12,34,567.89` and International `1,234,567.89`), keeping internal computation strings pure.
+5. **No Dynamic Monet Tinting:** Fixed pure black and tactical orange tokens ensure consistent hardware brand identity.
+
+---
+
+## 📄 License
+
+```
+Copyright 2026 MrGokulaKrishnan
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
