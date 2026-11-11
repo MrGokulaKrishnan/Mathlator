@@ -117,7 +117,7 @@ fun SettingsScreen(
                     .padding(vertical = 16.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                MathlatorLogo(size = 28.dp)
+                MathlatorLogo(size = 20.dp)
             }
 
             Spacer(Modifier.height(16.dp))
