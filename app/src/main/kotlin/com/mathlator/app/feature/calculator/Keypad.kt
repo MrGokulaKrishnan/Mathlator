@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.SyncAlt
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
@@ -53,6 +52,7 @@ fun Keypad(
     onDelete: () -> Unit,
     onClear: () -> Unit,
     onModeToggle: () -> Unit,
+    isScientificActive: Boolean,
     hapticsEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -192,7 +192,7 @@ fun Keypad(
         }
     }
 
-    // Mode Toggle Key (Basic ⇄ Scientific)
+    // Mode Toggle Key — shows "f(x)" and highlights in Primary when Scientific mode is on
     @Composable
     fun ModeKey(modifier: Modifier = Modifier) {
         val interactionSource = remember { MutableInteractionSource() }
@@ -219,11 +219,10 @@ fun Keypad(
                 .semantics { contentDescription = "toggle scientific mode" },
             contentAlignment = Alignment.Center,
         ) {
-            Icon(
-                imageVector = Icons.Outlined.SyncAlt,
-                contentDescription = null,
-                tint = colors.operator,
-                modifier = Modifier.size(28.dp),
+            Text(
+                text = "f(x)",
+                style = KeyTextStyle.copy(fontSize = 18.sp),
+                color = if (isScientificActive) Primary else colors.operator,
             )
         }
     }

@@ -2,8 +2,8 @@ package com.mathlator.app.feature.finance.currency
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mathlator.app.core.finance.CurrencyCalculator
 import com.mathlator.app.core.format.DigitGrouping
-import com.mathlator.app.core.format.NumberFormatter
 import com.mathlator.app.data.prefs.SettingsRepository
 import com.mathlator.app.data.rates.RatesRepository
 import com.mathlator.app.data.rates.RatesState
@@ -11,11 +11,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
-import java.math.MathContext
-import java.math.RoundingMode
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -28,16 +27,23 @@ data class CurrencyItem(
 )
 
 data class CurrencyUiState(
-    val fromCode: String = "INR",
-    val toCode: String = "USD",
-    val fromValue: String = "100",
-    val toValue: String = "",
+    val mainCode: String = "INR",
+    val out1Code: String = "USD",
+    val out2Code: String = "EUR",
+    val mainValue: String = "100",
+    val out1Value: String = "",
+    val out2Value: String = "",
+    val out1Rate: String = "",
+    val out2Rate: String = "",
     val isLoading: Boolean = false,
     val isOffline: Boolean = false,
     val lastUpdatedText: String = "",
     val isNoData: Boolean = false,
     val attributionText: String = "Rates from open.er-api.com",
 )
+
+/** Which card's picker is showing (null = none). */
+enum class PickerTarget { MAIN, OUT1, OUT2 }
 
 @HiltViewModel
 class CurrencyViewModel @Inject constructor(
@@ -49,39 +55,44 @@ class CurrencyViewModel @Inject constructor(
     val uiState: StateFlow<CurrencyUiState> = _uiState.asStateFlow()
 
     private var cachedRates: Map<String, BigDecimal> = emptyMap()
+    private var currentGrouping: DigitGrouping = DigitGrouping.Indian
 
     val currencyList: List<CurrencyItem> = listOf(
-        CurrencyItem("INR", "Indian Rupee", "🇮🇳", isPinned = true),
-        CurrencyItem("USD", "US Dollar", "🇺🇸", isPinned = true),
-        CurrencyItem("EUR", "Euro", "🇪🇺", isPinned = true),
-        CurrencyItem("GBP", "British Pound", "🇬🇧", isPinned = true),
-        CurrencyItem("JPY", "Japanese Yen", "🇯🇵", isPinned = true),
-        CurrencyItem("AUD", "Australian Dollar", "🇦🇺", isPinned = true),
-        CurrencyItem("CAD", "Canadian Dollar", "🇨🇦", isPinned = true),
-        CurrencyItem("CHF", "Swiss Franc", "🇨🇭", isPinned = true),
-        CurrencyItem("CNY", "Chinese Yuan", "🇨🇳", isPinned = true),
-        CurrencyItem("SGD", "Singapore Dollar", "🇸🇬", isPinned = true),
-        CurrencyItem("AED", "UAE Dirham", "🇦🇪", isPinned = true),
-        CurrencyItem("SAR", "Saudi Riyal", "🇸🇦", isPinned = false),
-        CurrencyItem("NZD", "New Zealand Dollar", "🇳🇿", isPinned = false),
-        CurrencyItem("KRW", "South Korean Won", "🇰🇷", isPinned = false),
-        CurrencyItem("BRL", "Brazilian Real", "🇧🇷", isPinned = false),
-        CurrencyItem("ZAR", "South African Rand", "🇿🇦", isPinned = false),
-        CurrencyItem("MXN", "Mexican Peso", "🇲🇽", isPinned = false),
-        CurrencyItem("THB", "Thai Baht", "🇹🇭", isPinned = false),
-        CurrencyItem("MYR", "Malaysian Ringgit", "🇲🇾", isPinned = false),
+        CurrencyItem("INR", "Indian Rupee",        "🇮🇳", isPinned = true),
+        CurrencyItem("USD", "US Dollar",            "🇺🇸", isPinned = true),
+        CurrencyItem("EUR", "Euro",                 "🇪🇺", isPinned = true),
+        CurrencyItem("GBP", "British Pound",        "🇬🇧", isPinned = true),
+        CurrencyItem("JPY", "Japanese Yen",         "🇯🇵", isPinned = true),
+        CurrencyItem("AUD", "Australian Dollar",    "🇦🇺", isPinned = true),
+        CurrencyItem("CAD", "Canadian Dollar",      "🇨🇦", isPinned = true),
+        CurrencyItem("CHF", "Swiss Franc",          "🇨🇭", isPinned = true),
+        CurrencyItem("CNY", "Chinese Yuan",         "🇨🇳", isPinned = true),
+        CurrencyItem("SGD", "Singapore Dollar",     "🇸🇬", isPinned = true),
+        CurrencyItem("AED", "UAE Dirham",           "🇦🇪", isPinned = true),
+        CurrencyItem("SAR", "Saudi Riyal",          "🇸🇦"),
+        CurrencyItem("NZD", "New Zealand Dollar",   "🇳🇿"),
+        CurrencyItem("KRW", "South Korean Won",     "🇰🇷"),
+        CurrencyItem("BRL", "Brazilian Real",       "🇧🇷"),
+        CurrencyItem("ZAR", "South African Rand",   "🇿🇦"),
+        CurrencyItem("MXN", "Mexican Peso",         "🇲🇽"),
+        CurrencyItem("THB", "Thai Baht",            "🇹🇭"),
+        CurrencyItem("MYR", "Malaysian Ringgit",    "🇲🇾"),
+        CurrencyItem("KWD", "Kuwaiti Dinar",        "🇰🇼"),
     )
 
     init {
-        // Collect default currency pair
         viewModelScope.launch {
-            settings.currencyFrom.collect { code ->
-                _uiState.update { it.copy(fromCode = code) }
-            }
-        }
-        viewModelScope.launch {
-            settings.currencyTo.collect { code ->
-                _uiState.update { it.copy(toCode = code) }
+            combine(
+                settings.currencyFrom,
+                settings.currencyTo,
+                settings.currencyOut2,
+                settings.digitGrouping,
+            ) { main, out1, out2, grouping ->
+                Tuple4(main, out1, out2, grouping)
+            }.collect { (main, out1, out2, grouping) ->
+                currentGrouping = grouping
+                _uiState.update { it.copy(mainCode = main, out1Code = out1, out2Code = out2) }
+                calculateConversions()
             }
         }
         loadRates(force = false)
@@ -90,11 +101,12 @@ class CurrencyViewModel @Inject constructor(
     fun loadRates(force: Boolean = false) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, isNoData = false) }
-            val state = ratesRepository.refresh(base = "USD", force = force)
-            when (state) {
+            when (val state = ratesRepository.refresh(base = "USD", force = force)) {
                 is RatesState.Ready -> {
                     cachedRates = state.rates
-                    val hoursAgo = ChronoUnit.HOURS.between(Instant.ofEpochMilli(state.fetchedAt), Instant.now())
+                    val hoursAgo = ChronoUnit.HOURS.between(
+                        Instant.ofEpochMilli(state.fetchedAt), Instant.now()
+                    )
                     val updatedText = if (state.isOffline) {
                         "Rates updated ${hoursAgo}h ago (offline)"
                     } else {
@@ -108,7 +120,7 @@ class CurrencyViewModel @Inject constructor(
                             isNoData = false,
                         )
                     }
-                    calculateConversion()
+                    calculateConversions()
                 }
                 RatesState.NoData -> {
                     _uiState.update { it.copy(isLoading = false, isNoData = true) }
@@ -121,68 +133,105 @@ class CurrencyViewModel @Inject constructor(
     }
 
     fun onDigit(d: String) {
-        val curr = _uiState.value.fromValue
-        val next = if (curr == "0") d else curr + d
-        _uiState.update { it.copy(fromValue = next) }
-        calculateConversion()
+        val curr = _uiState.value.mainValue
+        val next = when {
+            curr == "0" && d != "0" -> d
+            curr == "0" && d == "0" -> "0"
+            else -> curr + d
+        }
+        _uiState.update { it.copy(mainValue = next) }
+        calculateConversions()
     }
 
     fun onDecimal() {
-        val curr = _uiState.value.fromValue
+        val curr = _uiState.value.mainValue
         if (!curr.contains(".")) {
             val next = if (curr.isEmpty()) "0." else "$curr."
-            _uiState.update { it.copy(fromValue = next) }
-            calculateConversion()
+            _uiState.update { it.copy(mainValue = next) }
+            calculateConversions()
         }
     }
 
     fun onDelete() {
-        val curr = _uiState.value.fromValue
+        val curr = _uiState.value.mainValue
         val next = if (curr.isNotEmpty()) curr.dropLast(1) else ""
-        _uiState.update { it.copy(fromValue = next) }
-        calculateConversion()
+        _uiState.update { it.copy(mainValue = if (next.isEmpty()) "0" else next) }
+        calculateConversions()
     }
 
     fun onClear() {
-        _uiState.update { it.copy(fromValue = "0") }
-        calculateConversion()
+        _uiState.update { it.copy(mainValue = "0") }
+        calculateConversions()
     }
 
-    fun swapCurrencies() {
+    /**
+     * Set a currency for the given target slot.
+     * If [code] is already used in another slot, swap those two slots.
+     */
+    fun setCurrency(target: PickerTarget, code: String) {
+        val s = _uiState.value
+        val slot = when (target) {
+            PickerTarget.MAIN -> 0
+            PickerTarget.OUT1 -> 1
+            PickerTarget.OUT2 -> 2
+        }
+        val (newMain, newOut1, newOut2) = CurrencyCalculator.swapSlots(
+            slot, code, s.mainCode, s.out1Code, s.out2Code
+        )
+        viewModelScope.launch {
+            if (newMain != s.mainCode) settings.setCurrencyFrom(newMain)
+            if (newOut1 != s.out1Code) settings.setCurrencyTo(newOut1)
+            if (newOut2 != s.out2Code) settings.setCurrencyOut2(newOut2)
+        }
+    }
+
+    /**
+     * Promote a converted card to MAIN.
+     * The promoted card's currency becomes MAIN; MAIN's currency moves to that slot.
+     * The typed amount becomes the promoted card's current displayed value.
+     */
+    fun promoteToMain(target: PickerTarget) {
+        val s = _uiState.value
+        val slot = when (target) {
+            PickerTarget.OUT1 -> 1
+            PickerTarget.OUT2 -> 2
+            PickerTarget.MAIN -> return
+        }
+        val (newCurrencies, newMainVal) = CurrencyCalculator.promoteToMain(
+            slot, s.mainCode, s.out1Code, s.out2Code, s.out1Value, s.out2Value
+        )
+        viewModelScope.launch {
+            if (newCurrencies.first != s.mainCode) settings.setCurrencyFrom(newCurrencies.first)
+            if (newCurrencies.second != s.out1Code) settings.setCurrencyTo(newCurrencies.second)
+            if (newCurrencies.third != s.out2Code) settings.setCurrencyOut2(newCurrencies.third)
+            _uiState.update { it.copy(mainValue = newMainVal) }
+            calculateConversions()
+        }
+    }
+
+    private fun calculateConversions() {
+        val s = _uiState.value
+        val amount = s.mainValue.toBigDecimalOrNull() ?: BigDecimal.ZERO
+        if (cachedRates.isEmpty()) return
+
+        val converted1 = CurrencyCalculator.convert(amount, s.mainCode, s.out1Code, cachedRates)
+        val converted2 = CurrencyCalculator.convert(amount, s.mainCode, s.out2Code, cachedRates)
+
+        val out1 = CurrencyCalculator.formatConverted(converted1, s.out1Code, currentGrouping)
+        val out2 = CurrencyCalculator.formatConverted(converted2, s.out2Code, currentGrouping)
+
+        val rate1 = CurrencyCalculator.rateCaption(s.mainCode, s.out1Code, cachedRates)
+        val rate2 = CurrencyCalculator.rateCaption(s.mainCode, s.out2Code, cachedRates)
+
         _uiState.update {
             it.copy(
-                fromCode = it.toCode,
-                toCode = it.fromCode,
-                fromValue = it.toValue.ifEmpty { "1" },
+                out1Value = out1,
+                out2Value = out2,
+                out1Rate = rate1,
+                out2Rate = rate2,
             )
         }
-        calculateConversion()
     }
 
-    fun setFromCurrency(code: String) {
-        _uiState.update { it.copy(fromCode = code) }
-        calculateConversion()
-    }
-
-    fun setToCurrency(code: String) {
-        _uiState.update { it.copy(toCode = code) }
-        calculateConversion()
-    }
-
-    private fun calculateConversion() {
-        val s = _uiState.value
-        val amount = s.fromValue.toBigDecimalOrNull() ?: BigDecimal.ZERO
-        if (amount <= BigDecimal.ZERO || cachedRates.isEmpty()) return
-
-        // Cross rate relative to base USD: amount * rate[to] / rate[from]
-        val rateFrom = cachedRates[s.fromCode] ?: BigDecimal.ONE
-        val rateTo = cachedRates[s.toCode] ?: BigDecimal.ONE
-
-        val converted = amount.multiply(rateTo, MathContext.DECIMAL128)
-            .divide(rateFrom, 4, RoundingMode.HALF_UP)
-
-        _uiState.update {
-            it.copy(toValue = NumberFormatter.format(converted, precision = 4, grouping = DigitGrouping.None))
-        }
-    }
+    private data class Tuple4<A, B, C, D>(val a: A, val b: B, val c: C, val d: D)
 }

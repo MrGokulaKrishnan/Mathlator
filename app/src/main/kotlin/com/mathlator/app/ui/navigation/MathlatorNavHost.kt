@@ -15,11 +15,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,12 +37,12 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -247,120 +250,118 @@ private fun MainTabShell(
     calculatorViewModel: CalculatorViewModel,
     settingsRepository: SettingsRepository,
     onNavigateToRoute: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colors = mathlatorColors
     val scope = rememberCoroutineScope()
-    var savedTabIndex by rememberSaveable { mutableStateOf(0) }
+    var savedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     val pagerState = rememberPagerState(initialPage = savedTabIndex, pageCount = { 3 })
     var showOverflowMenu by remember { mutableStateOf(false) }
 
     val isOneHanded by settingsRepository.oneHandedEnabled.collectAsState(initial = false)
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        containerColor = colors.background,
-        topBar = {
-            // Top Bar (56dp, black): [One-handed toggle] [3 tab icons] [⋮ overflow]
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .background(colors.background)
-                    .padding(horizontal = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                // Left slot: one-handed toggle (only visible on Calculator tab)
-                Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) {
-                    if (pagerState.currentPage == 0) {
-                        IconButton(onClick = {
+    // Single inset consumption: status bar + nav bar + cutout + IME.
+    // Nested Scaffold/TopAppBar screens do NOT receive these insets again.
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(colors.background)
+            .windowInsetsPadding(WindowInsets.safeDrawing),
+    ) {
+        // ── Top Bar (56dp) ────────────────────────────────────────────────────
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .background(colors.background)
+                .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            // Left slot: one-handed toggle (only on Calculator tab)
+            Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) {
+                if (pagerState.currentPage == 0) {
+                    IconButton(
+                        onClick = {
                             scope.launch { settingsRepository.setOneHanded(!isOneHanded) }
-                        }) {
-                            Icon(
-                                imageVector = if (isOneHanded) Icons.Outlined.OpenInFull else Icons.Outlined.StayCurrentPortrait,
-                                contentDescription = if (isOneHanded) "Exit one-handed mode" else "One-handed mode",
-                                tint = if (isOneHanded) Primary else colors.textDim,
-                            )
-                        }
-                    }
-                }
-
-                // Center slot: Three tab icons evenly spaced
-                Row(
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    TabIconItem(
-                        icon = Icons.Outlined.Calculate,
-                        contentDescription = "Calculator",
-                        isSelected = pagerState.currentPage == 0,
-                        onClick = { scope.launch { pagerState.animateScrollToPage(0) } },
-                    )
-                    Spacer(Modifier.padding(horizontal = 16.dp))
-                    TabIconItem(
-                        icon = Icons.Outlined.GridView,
-                        contentDescription = "Converters",
-                        isSelected = pagerState.currentPage == 1,
-                        onClick = { scope.launch { pagerState.animateScrollToPage(1) } },
-                    )
-                    Spacer(Modifier.padding(horizontal = 16.dp))
-                    TabIconItem(
-                        icon = Icons.Outlined.CurrencyExchange,
-                        contentDescription = "Finance",
-                        isSelected = pagerState.currentPage == 2,
-                        onClick = { scope.launch { pagerState.animateScrollToPage(2) } },
-                    )
-                }
-
-                // Right slot: Overflow Menu (⋮)
-                Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) {
-                    IconButton(onClick = { showOverflowMenu = true }) {
-                        Icon(
-                            imageVector = Icons.Outlined.MoreVert,
-                            contentDescription = "More options",
-                            tint = colors.textDim,
-                        )
-                    }
-
-                    DropdownMenu(
-                        expanded = showOverflowMenu,
-                        onDismissRequest = { showOverflowMenu = false },
-                        modifier = Modifier
-                            .background(colors.surfaceHigh, RoundedCornerShape(16.dp))
-                            .clip(RoundedCornerShape(16.dp)),
+                        },
+                        modifier = Modifier.semantics {
+                            contentDescription = "One-handed mode"
+                        },
                     ) {
-                        DropdownMenuItem(
-                            text = { Text("History", color = colors.textMain) },
-                            onClick = {
-                                showOverflowMenu = false
-                                onNavigateToRoute(Screen.History.route)
-                            },
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Settings", color = colors.textMain) },
-                            onClick = {
-                                showOverflowMenu = false
-                                onNavigateToRoute(Screen.Settings.route)
-                            },
-                        )
-                        DropdownMenuItem(
-                            text = { Text("About", color = colors.textMain) },
-                            onClick = {
-                                showOverflowMenu = false
-                                onNavigateToRoute(Screen.About.route)
-                            },
+                        Icon(
+                            imageVector = if (isOneHanded) Icons.Outlined.OpenInFull else Icons.Outlined.StayCurrentPortrait,
+                            contentDescription = "One-handed mode",
+                            tint = if (isOneHanded) Primary else colors.textDim,
                         )
                     }
                 }
             }
-        },
-    ) { innerPadding ->
+
+            // Centre: three tab icons, evenly spaced
+            Row(
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TabIconItem(
+                    icon = Icons.Outlined.Calculate,
+                    contentDescription = "Calculator",
+                    isSelected = pagerState.currentPage == 0,
+                    onClick = { scope.launch { pagerState.animateScrollToPage(0) } },
+                )
+                Spacer(Modifier.padding(horizontal = 16.dp))
+                TabIconItem(
+                    icon = Icons.Outlined.GridView,
+                    contentDescription = "Converters",
+                    isSelected = pagerState.currentPage == 1,
+                    onClick = { scope.launch { pagerState.animateScrollToPage(1) } },
+                )
+                Spacer(Modifier.padding(horizontal = 16.dp))
+                TabIconItem(
+                    icon = Icons.Outlined.CurrencyExchange,
+                    contentDescription = "Finance",
+                    isSelected = pagerState.currentPage == 2,
+                    onClick = { scope.launch { pagerState.animateScrollToPage(2) } },
+                )
+            }
+
+            // Right: overflow menu
+            Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) {
+                IconButton(onClick = { showOverflowMenu = true }) {
+                    Icon(
+                        imageVector = Icons.Outlined.MoreVert,
+                        contentDescription = "More options",
+                        tint = colors.textDim,
+                    )
+                }
+                DropdownMenu(
+                    expanded = showOverflowMenu,
+                    onDismissRequest = { showOverflowMenu = false },
+                    modifier = Modifier
+                        .background(colors.surfaceHigh, RoundedCornerShape(16.dp))
+                        .clip(RoundedCornerShape(16.dp)),
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("History", color = colors.textMain) },
+                        onClick = { showOverflowMenu = false; onNavigateToRoute(Screen.History.route) },
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Settings", color = colors.textMain) },
+                        onClick = { showOverflowMenu = false; onNavigateToRoute(Screen.Settings.route) },
+                    )
+                    DropdownMenuItem(
+                        text = { Text("About", color = colors.textMain) },
+                        onClick = { showOverflowMenu = false; onNavigateToRoute(Screen.About.route) },
+                    )
+                }
+            }
+        }
+
+        // ── Pager ─────────────────────────────────────────────────────────────
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier = Modifier.fillMaxSize(),
         ) { page ->
             when (page) {
                 0 -> CalculatorScreen(
@@ -390,35 +391,26 @@ private fun TabIconItem(
         modifier = Modifier
             .size(44.dp)
             .clip(RoundedCornerShape(12.dp))
+            .then(
+                if (isSelected) {
+                    Modifier.background(brandGradientBrush(), RoundedCornerShape(12.dp))
+                } else {
+                    Modifier
+                }
+            )
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = ripple(bounded = true, radius = 24.dp),
+                indication = ripple(bounded = true, radius = 22.dp),
                 onClick = onClick,
             )
             .semantics { this.contentDescription = contentDescription },
         contentAlignment = Alignment.Center,
     ) {
-        if (isSelected) {
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .background(brandGradientBrush(), RoundedCornerShape(8.dp)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp),
-                )
-            }
-        } else {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = colors.textDim,
-                modifier = Modifier.size(28.dp),
-            )
-        }
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = if (isSelected) Color.White else colors.textDim,
+            modifier = Modifier.size(28.dp),
+        )
     }
 }

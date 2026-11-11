@@ -52,6 +52,9 @@ class SettingsViewModel @Inject constructor(
     val currencyTo: StateFlow<String> = settings.currencyTo
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "USD")
 
+    val currencyOut2: StateFlow<String> = settings.currencyOut2
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "EUR")
+
     fun setTheme(theme: AppTheme) = viewModelScope.launch { settings.setTheme(theme) }
     fun setHaptics(enabled: Boolean) = viewModelScope.launch { settings.setHaptics(enabled) }
     fun setKeySound(enabled: Boolean) = viewModelScope.launch { settings.setKeySound(enabled) }
@@ -60,6 +63,9 @@ class SettingsViewModel @Inject constructor(
     fun setDigitGrouping(grouping: DigitGrouping) = viewModelScope.launch { settings.setDigitGrouping(grouping) }
     fun setKeepScreenOn(enabled: Boolean) = viewModelScope.launch { settings.setKeepScreenOn(enabled) }
     fun setOneHandedSide(side: String) = viewModelScope.launch { settings.setOneHandedSide(side) }
+    fun setCurrencyFrom(code: String) = viewModelScope.launch { settings.setCurrencyFrom(code) }
+    fun setCurrencyTo(code: String) = viewModelScope.launch { settings.setCurrencyTo(code) }
+    fun setCurrencyOut2(code: String) = viewModelScope.launch { settings.setCurrencyOut2(code) }
 
     fun clearHistory(onCleared: () -> Unit) = viewModelScope.launch {
         historyDao.deleteAll()

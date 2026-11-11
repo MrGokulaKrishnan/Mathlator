@@ -15,10 +15,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
@@ -35,7 +38,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,6 +76,10 @@ fun SettingsScreen(
     val grouping by viewModel.digitGrouping.collectAsState()
     val keepScreenOn by viewModel.keepScreenOn.collectAsState()
     val oneHandedSide by viewModel.oneHandedSide.collectAsState()
+    val currencyFrom by viewModel.currencyFrom.collectAsState()
+    val currencyTo by viewModel.currencyTo.collectAsState()
+    val currencyOut2 by viewModel.currencyOut2.collectAsState()
+    var showCurrencyDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -178,6 +187,94 @@ fun SettingsScreen(
 
             // SECTION: DATA
             SectionHeader("Data")
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Default currencies", color = colors.textMain, fontSize = 16.sp)
+                    Text("$currencyFrom · $currencyTo · $currencyOut2", color = colors.textDim, fontSize = 12.sp)
+                }
+                TextButton(onClick = { showCurrencyDialog = true }) {
+                    Text("Edit", color = Primary)
+                }
+            }
+
+            if (showCurrencyDialog) {
+                var editMain by remember(currencyFrom) { mutableStateOf(currencyFrom) }
+                var editOut1 by remember(currencyTo) { mutableStateOf(currencyTo) }
+                var editOut2 by remember(currencyOut2) { mutableStateOf(currencyOut2) }
+
+                AlertDialog(
+                    onDismissRequest = { showCurrencyDialog = false },
+                    title = { Text("Default Currencies", color = colors.textMain) },
+                    text = {
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            OutlinedTextField(
+                                value = editMain,
+                                onValueChange = { editMain = it.uppercase().take(3) },
+                                label = { Text("Main Currency", color = colors.textDim) },
+                                singleLine = true,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Primary,
+                                    focusedLabelColor = Primary,
+                                    unfocusedBorderColor = colors.divider,
+                                    focusedTextColor = colors.textMain,
+                                    unfocusedTextColor = colors.textMain,
+                                ),
+                            )
+                            OutlinedTextField(
+                                value = editOut1,
+                                onValueChange = { editOut1 = it.uppercase().take(3) },
+                                label = { Text("Converted Currency 1", color = colors.textDim) },
+                                singleLine = true,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Primary,
+                                    focusedLabelColor = Primary,
+                                    unfocusedBorderColor = colors.divider,
+                                    focusedTextColor = colors.textMain,
+                                    unfocusedTextColor = colors.textMain,
+                                ),
+                            )
+                            OutlinedTextField(
+                                value = editOut2,
+                                onValueChange = { editOut2 = it.uppercase().take(3) },
+                                label = { Text("Converted Currency 2", color = colors.textDim) },
+                                singleLine = true,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Primary,
+                                    focusedLabelColor = Primary,
+                                    unfocusedBorderColor = colors.divider,
+                                    focusedTextColor = colors.textMain,
+                                    unfocusedTextColor = colors.textMain,
+                                ),
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                if (editMain.isNotBlank()) viewModel.setCurrencyFrom(editMain)
+                                if (editOut1.isNotBlank()) viewModel.setCurrencyTo(editOut1)
+                                if (editOut2.isNotBlank()) viewModel.setCurrencyOut2(editOut2)
+                                showCurrencyDialog = false
+                            }
+                        ) {
+                            Text("Save", color = Primary)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showCurrencyDialog = false }) {
+                            Text("Cancel", color = colors.textDim)
+                        }
+                    },
+                    containerColor = colors.surfaceHigh,
+                )
+            }
 
             Row(
                 modifier = Modifier

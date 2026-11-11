@@ -35,17 +35,33 @@ class SettingsRepository @Inject constructor(
         val ONE_HANDED_SIDE = stringPreferencesKey("one_handed_side") // "left" | "right"
         val CURRENCY_FROM   = stringPreferencesKey("currency_from")
         val CURRENCY_TO     = stringPreferencesKey("currency_to")
+        val CURRENCY_OUT2   = stringPreferencesKey("currency_out2")
     }
 
     // ── Defaults ──────────────────────────────────────────────────────────────
     companion object {
-        const val DEFAULT_CURRENCY_FROM  = "INR"
-        const val DEFAULT_CURRENCY_TO    = "USD"
+        fun getRegionDefaultCurrencies(): Triple<String, String, String> {
+            return try {
+                val locale = java.util.Locale.getDefault()
+                val currency = java.util.Currency.getInstance(locale)
+                val code = currency?.currencyCode ?: "INR"
+                when (code) {
+                    "USD" -> Triple("USD", "EUR", "GBP")
+                    "EUR" -> Triple("EUR", "USD", "GBP")
+                    else  -> Triple(code, "USD", "EUR")
+                }
+            } catch (_: Exception) {
+                Triple("INR", "USD", "EUR")
+            }
+        }
+
         const val DEFAULT_DECIMAL_PREC   = 10
         val DEFAULT_GROUPING             = DigitGrouping.Indian
         val DEFAULT_ANGLE_MODE           = AngleMode.DEG
         val DEFAULT_THEME                = AppTheme.Dark
     }
+
+    private val regionDefaults by lazy { getRegionDefaultCurrencies() }
 
     // ── Flows ─────────────────────────────────────────────────────────────────
 
@@ -76,11 +92,15 @@ class SettingsRepository @Inject constructor(
     val oneHandedSide: Flow<String> = store.data.map { p -> p[Keys.ONE_HANDED_SIDE] ?: "right" }
 
     val currencyFrom: Flow<String> = store.data.map { p ->
-        p[Keys.CURRENCY_FROM] ?: DEFAULT_CURRENCY_FROM
+        p[Keys.CURRENCY_FROM] ?: regionDefaults.first
     }
 
     val currencyTo: Flow<String> = store.data.map { p ->
-        p[Keys.CURRENCY_TO] ?: DEFAULT_CURRENCY_TO
+        p[Keys.CURRENCY_TO] ?: regionDefaults.second
+    }
+
+    val currencyOut2: Flow<String> = store.data.map { p ->
+        p[Keys.CURRENCY_OUT2] ?: regionDefaults.third
     }
 
     // ── Setters ───────────────────────────────────────────────────────────────
@@ -96,4 +116,5 @@ class SettingsRepository @Inject constructor(
     suspend fun setOneHandedSide(side: String) = store.edit { it[Keys.ONE_HANDED_SIDE] = side }
     suspend fun setCurrencyFrom(code: String) = store.edit { it[Keys.CURRENCY_FROM] = code }
     suspend fun setCurrencyTo(code: String) = store.edit { it[Keys.CURRENCY_TO] = code }
+    suspend fun setCurrencyOut2(code: String) = store.edit { it[Keys.CURRENCY_OUT2] = code }
 }
