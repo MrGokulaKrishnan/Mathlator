@@ -158,10 +158,15 @@ object TacticalIcons {
     val Calculator: ImageVector = vector(
         name = "Calculator",
         viewportSize = 24f,
-        strokeWidth = 2.1f,
+        strokeWidth = 2.0f,
         paths = listOf(
-            "M 7 4 H 17 A 3 3 0 0 1 20 7 V 17 A 3 3 0 0 1 17 20 H 7 A 3 3 0 0 1 4 7 V 7 A 3 3 0 0 1 7 4 Z",
-            "M 7.5 9 H 10.5 M 13.5 7.8 L 15.9 10.2 M 15.9 7.8 L 13.5 10.2 M 9 13.8 V 16.8 M 7.5 15.3 H 10.5 M 13.5 14.2 H 16.5 M 13.5 16.5 H 16.5"
+            // Symmetrical rounded squircle body (x: 3 -> 21, y: 3 -> 21, rx: 3.5)
+            "M 6.5 3 H 17.5 A 3.5 3.5 0 0 1 21 6.5 V 17.5 A 3.5 3.5 0 0 1 17.5 21 H 6.5 A 3.5 3.5 0 0 1 3 17.5 V 6.5 A 3.5 3.5 0 0 1 6.5 3 Z",
+            // 4 quadrant math operators: + (top-left), − (top-right), × (bottom-left), = (bottom-right)
+            "M 6.5 9 H 10.5 M 8.5 7 V 11 M 13.5 9 H 17.5 M 6.8 13.8 L 10.2 17.2 M 10.2 13.8 L 6.8 17.2 M 13.5 14 H 17.5 M 13.5 17 H 17.5"
+        ),
+        fillPaths = listOf(
+            "M 6.5 3 H 17.5 A 3.5 3.5 0 0 1 21 6.5 V 17.5 A 3.5 3.5 0 0 1 17.5 21 H 6.5 A 3.5 3.5 0 0 1 3 17.5 V 6.5 A 3.5 3.5 0 0 1 6.5 3 Z"
         )
     )
 
