@@ -58,7 +58,9 @@ import java.math.BigDecimal
 
 data class FinanceInstrumentItem(
     val title: String,
-    val previewTag: String,
+    val subtitle: String,
+    val badge: String,
+    val isLiveFx: Boolean,
     val icon: ImageVector,
     val route: String,
 )
@@ -69,13 +71,41 @@ fun FinanceScreen(
     modifier: Modifier = Modifier,
 ) {
     val instruments = listOf(
-        FinanceInstrumentItem("GST Calculator", "5%–28% Slabs", TacticalIcons.Gst, Screen.GstTool.route),
-        FinanceInstrumentItem("Currency Rack", "AED • USD • INR", TacticalIcons.Currency, Screen.CurrencyTool.route),
-        FinanceInstrumentItem("Investment", "CAGR / SIP Growth", TacticalIcons.Investment, Screen.InvestmentTool.route),
-        FinanceInstrumentItem("Loan & EMI", "EMI / Amortization", TacticalIcons.Loan, Screen.LoanTool.route),
+        FinanceInstrumentItem(
+            title = "GST Tax",
+            subtitle = "CGST / SGST Split",
+            badge = "5–28%",
+            isLiveFx = false,
+            icon = TacticalIcons.Gst,
+            route = Screen.GstTool.route,
+        ),
+        FinanceInstrumentItem(
+            title = "Currency",
+            subtitle = "AED • USD • INR →",
+            badge = "FX",
+            isLiveFx = true,
+            icon = TacticalIcons.Currency,
+            route = Screen.CurrencyTool.route,
+        ),
+        FinanceInstrumentItem(
+            title = "Investment",
+            subtitle = "SIP & Compound",
+            badge = "CAGR",
+            isLiveFx = false,
+            icon = TacticalIcons.Investment,
+            route = Screen.InvestmentTool.route,
+        ),
+        FinanceInstrumentItem(
+            title = "Loan EMI",
+            subtitle = "Monthly Breakdown",
+            badge = "EMI",
+            isLiveFx = false,
+            icon = TacticalIcons.Loan,
+            route = Screen.LoanTool.route,
+        ),
     )
 
-    var gstBaseAmount by remember { mutableStateOf("1000") }
+    var gstBaseAmount by remember { mutableStateOf("10000") }
     var selectedSlab by remember { mutableStateOf("18") }
 
     val gstResult = remember(gstBaseAmount, selectedSlab) {
@@ -88,12 +118,12 @@ fun FinanceScreen(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 14.dp, vertical = 6.dp),
     ) {
         // ── 2×2 Tactical Instrument Cards Grid ────────────────────────────────
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             InstrumentCard(
                 item = instruments[0],
@@ -107,11 +137,11 @@ fun FinanceScreen(
             )
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(10.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             InstrumentCard(
                 item = instruments[2],
@@ -125,9 +155,9 @@ fun FinanceScreen(
             )
         }
 
-        Spacer(Modifier.height(18.dp))
+        Spacer(Modifier.height(14.dp))
 
-        // ── Embedded Quick Interactive GST Split Module ──────────────────────
+        // ── Embedded Instant GST Calculator Module ───────────────────────────
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -135,19 +165,161 @@ fun FinanceScreen(
                     cornerRadius = TacticalDimens.WellCornerRadius,
                     isFocused = true,
                 )
-                .padding(18.dp),
+                .padding(14.dp),
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                // Header row
+                // Top header: Title + Slab Pills
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "QUICK GST SPLIT // TELEMETRY",
-                        style = TacticalTypography.TelemetryMicroBadge,
+                        text = "INSTANT GST CALCULATOR",
+                        style = TacticalTypography.TelemetryMicroBadge.copy(
+                            color = TacticalColors.TacticalOrange,
+                            fontSize = 10.sp,
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = FontWeight.SemiBold,
+                        ),
                     )
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        listOf("5", "12", "18", "28").forEach { slab ->
+                            val isSelected = selectedSlab == slab
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(
+                                        if (isSelected) TacticalColors.KeycapEqualsBase
+                                        else TacticalColors.KeycapUtilBase
+                                    )
+                                    .clickable { selectedSlab = slab }
+                                    .padding(horizontal = 7.dp, vertical = 3.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(
+                                    text = "$slab%",
+                                    color = if (isSelected) Color.White else TacticalColors.TextSecondary,
+                                    fontSize = 10.sp,
+                                    fontFamily = FontFamily.Monospace,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(10.dp))
+
+                // Presets quick row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    listOf("1000", "5000", "10000", "25000").forEach { preset ->
+                        val isSelected = gstBaseAmount == preset
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(26.dp)
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(
+                                    if (isSelected) TacticalColors.KeycapEqualsBase
+                                    else TacticalColors.KeycapNumBase
+                                )
+                                .clickable { gstBaseAmount = preset },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = "₹$preset",
+                                color = if (isSelected) Color.White else TacticalColors.TextMuted,
+                                fontSize = 10.sp,
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(10.dp))
+
+                // Dual Cards: Base Amount & GST Tax
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .tacticalCard(cornerRadius = 12.dp)
+                            .padding(10.dp),
+                    ) {
+                        Column {
+                            Text(
+                                text = "BASE AMOUNT (₹)",
+                                style = TacticalTypography.TelemetryLabel.copy(fontSize = 9.sp),
+                            )
+                            Spacer(Modifier.height(2.dp))
+                            Text(
+                                text = "₹${NumberFormatter.format(gstBaseAmount.toBigDecimalOrNull() ?: BigDecimal.ZERO)}",
+                                style = TacticalTypography.TelemetryValue.copy(
+                                    fontSize = 16.sp,
+                                    color = TacticalColors.TextPrimary,
+                                ),
+                            )
+                        }
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .tacticalCard(cornerRadius = 12.dp)
+                            .padding(10.dp),
+                    ) {
+                        Column {
+                            Text(
+                                text = "GST TAX ($selectedSlab%)",
+                                style = TacticalTypography.TelemetryLabel.copy(fontSize = 9.sp),
+                            )
+                            Spacer(Modifier.height(2.dp))
+                            Text(
+                                text = "+₹${NumberFormatter.format(gstResult.gstAmount)}",
+                                style = TacticalTypography.TelemetryValue.copy(
+                                    fontSize = 16.sp,
+                                    color = TacticalColors.TacticalOrange,
+                                ),
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(10.dp))
+
+                // Bottom summary bar
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        Text(
+                            text = "TOTAL INCLUSIVE:",
+                            style = TacticalTypography.TelemetryLabel.copy(fontSize = 10.sp),
+                        )
+                        Text(
+                            text = "₹${NumberFormatter.format(gstResult.totalAmount)}",
+                            style = TacticalTypography.TelemetryValue.copy(
+                                fontSize = 16.sp,
+                                color = TacticalColors.TextPrimary,
+                                fontWeight = FontWeight.Bold,
+                            ),
+                        )
+                    }
+
                     Row(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
@@ -170,109 +342,6 @@ fun FinanceScreen(
                         )
                     }
                 }
-
-                Spacer(Modifier.height(12.dp))
-
-                // Amount Presets
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    listOf("500", "1000", "5000", "25000").forEach { preset ->
-                        val isSelected = gstBaseAmount == preset
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(32.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(if (isSelected) TacticalColors.KeycapEqualsBase else TacticalColors.KeycapNumBase)
-                                .clickable { gstBaseAmount = preset },
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Text(
-                                text = "₹$preset",
-                                color = if (isSelected) Color.White else TacticalColors.TextSecondary,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium,
-                            )
-                        }
-                    }
-                }
-
-                Spacer(Modifier.height(12.dp))
-
-                // Slab Selector Pills [5%] [12%] [18%] [28%]
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    listOf("5", "12", "18", "28").forEach { slab ->
-                        val isSelected = selectedSlab == slab
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(36.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(if (isSelected) TacticalColors.KeycapEqualsBase else TacticalColors.KeycapUtilBase)
-                                .clickable { selectedSlab = slab },
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Text(
-                                text = "$slab%",
-                                color = if (isSelected) Color.White else TacticalColors.TacticalOrange,
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-                    }
-                }
-
-                Spacer(Modifier.height(16.dp))
-
-                // Breakdown Matrix (CGST + SGST + Total)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    MiniTelemetryBox(
-                        label = "CGST (${selectedSlab.toInt() / 2}%)",
-                        value = "₹${NumberFormatter.format(gstResult.cgst)}",
-                        modifier = Modifier.weight(1f),
-                    )
-                    MiniTelemetryBox(
-                        label = "SGST (${selectedSlab.toInt() / 2}%)",
-                        value = "₹${NumberFormatter.format(gstResult.sgst)}",
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-
-                Spacer(Modifier.height(10.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column {
-                        Text(
-                            text = "TOTAL INVOICE (INC. GST)",
-                            style = TacticalTypography.TelemetryLabel,
-                        )
-                        Text(
-                            text = "₹${NumberFormatter.format(gstResult.totalAmount)}",
-                            style = TacticalTypography.TelemetryValue.copy(
-                                color = TacticalColors.TacticalOrange,
-                                fontSize = 24.sp,
-                            ),
-                        )
-                    }
-                    Text(
-                        text = "+₹${NumberFormatter.format(gstResult.gstAmount)} GST",
-                        color = TacticalColors.TextSecondary,
-                        fontSize = 13.sp,
-                        fontFamily = FontFamily.Monospace,
-                    )
-                }
             }
         }
 
@@ -291,7 +360,7 @@ private fun InstrumentCard(
 
     Box(
         modifier = modifier
-            .height(130.dp)
+            .height(116.dp)
             .tacticalCard(
                 cornerRadius = TacticalDimens.CardCornerRadius,
                 isPressed = isPressed,
@@ -301,7 +370,7 @@ private fun InstrumentCard(
                 indication = ripple(bounded = true, radius = 54.dp),
                 onClick = onClick,
             )
-            .padding(14.dp)
+            .padding(12.dp)
             .semantics { contentDescription = item.title },
         contentAlignment = Alignment.CenterStart,
     ) {
@@ -317,24 +386,49 @@ private fun InstrumentCard(
                 // Etched Icon Socket
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
-                        .tacticalSocket(cornerRadius = 12.dp),
+                        .size(38.dp)
+                        .tacticalSocket(cornerRadius = 10.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         imageVector = item.icon,
                         contentDescription = null,
                         tint = TacticalColors.TacticalOrange,
-                        modifier = Modifier.size(22.dp),
+                        modifier = Modifier.size(20.dp),
                     )
                 }
 
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
-                    contentDescription = null,
-                    tint = TacticalColors.TextMuted,
-                    modifier = Modifier.size(16.dp),
-                )
+                // Badge pill
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(
+                            if (item.isLiveFx) Color(0x2A10B981)
+                            else Color(0x26FF5E00)
+                        )
+                        .padding(horizontal = 6.dp, vertical = 2.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(3.dp),
+                    ) {
+                        if (item.isLiveFx) {
+                            Box(
+                                modifier = Modifier
+                                    .size(4.dp)
+                                    .background(Color(0xFF10B981), shape = androidx.compose.foundation.shape.CircleShape)
+                            )
+                        }
+                        Text(
+                            text = item.badge,
+                            color = if (item.isLiveFx) Color(0xFF34D399) else TacticalColors.TacticalOrange,
+                            fontSize = 9.sp,
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
+                }
             }
 
             Column {
@@ -343,10 +437,14 @@ private fun InstrumentCard(
                     style = TacticalTypography.BentoTitle.copy(fontSize = 14.sp),
                     maxLines = 1,
                 )
-                Spacer(Modifier.height(2.dp))
+                Spacer(Modifier.height(1.dp))
                 Text(
-                    text = item.previewTag,
-                    style = TacticalTypography.BentoSubtitle,
+                    text = item.subtitle,
+                    style = TacticalTypography.BentoSubtitle.copy(
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 9.sp,
+                        color = if (item.isLiveFx) TacticalColors.TacticalOrange else TacticalColors.TextMuted,
+                    ),
                     maxLines = 1,
                 )
             }

@@ -126,7 +126,7 @@ fun CurrencyScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Multi-Currency Rack", style = TitleTextStyle, color = TacticalColors.TextPrimary) },
+                title = { Text("Currency", style = TitleTextStyle, color = TacticalColors.TextPrimary) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -203,9 +203,9 @@ fun CurrencyScreen(
 
                 Spacer(Modifier.height(10.dp))
 
-                // Slot 2: CONVERTED TARGET 1
+                // Slot 2: CONVERTED
                 TargetRackSlot(
-                    targetLabel = "TARGET 1",
+                    targetLabel = "CONVERTED",
                     amount = state.out1Value.ifEmpty { "—" },
                     currencyCode = state.out1Code,
                     rateCaption = state.out1Rate,
@@ -215,9 +215,9 @@ fun CurrencyScreen(
 
                 Spacer(Modifier.height(10.dp))
 
-                // Slot 3: CONVERTED TARGET 2
+                // Slot 3: CONVERTED
                 TargetRackSlot(
-                    targetLabel = "TARGET 2",
+                    targetLabel = "CONVERTED",
                     amount = state.out2Value.ifEmpty { "—" },
                     currencyCode = state.out2Code,
                     rateCaption = state.out2Rate,

@@ -22,10 +22,10 @@ import com.mathlator.app.ui.theme.WordmarkTextStyle
  * white wordmark MATHLATOR centered between them.
  */
 @Composable
-fun MathlatorLogo(modifier: Modifier = Modifier, size: Dp = 22.dp) {
+fun MathlatorLogo(modifier: Modifier = Modifier, size: Dp = 16.dp) {
     val barBrush = brandGradientBrush()
-    val barWidth = size * 5.4f
-    val barHeight = size * 0.9f
+    val barWidth = size * 4.6f
+    val barHeight = size * 0.8f
 
     Column(
         modifier = modifier,
@@ -44,10 +44,10 @@ fun MathlatorLogo(modifier: Modifier = Modifier, size: Dp = 22.dp) {
         // "MATHLATOR" wordmark
         Text(
             text = "MATHLATOR",
-            style = WordmarkTextStyle.copy(fontSize = (size.value * 0.8f).sp),
+            style = WordmarkTextStyle.copy(fontSize = (size.value * 0.78f).sp),
             color = Color.White,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(vertical = size * 0.4f),
+            modifier = Modifier.padding(vertical = size * 0.35f),
         )
 
         // Bottom bar

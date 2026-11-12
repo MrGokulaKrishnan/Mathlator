@@ -13,6 +13,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.horizontalScroll
@@ -25,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -131,43 +133,68 @@ fun Display(
                 },
             horizontalAlignment = Alignment.End,
         ) {
-            // Top Status Row: CALC // DEG micro-badge on left, Expression line on right
+            // Tier 1: OLED Telemetry Status Line
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = "CALC // $angleMode",
-                    style = TacticalTypography.TelemetryMicroBadge,
-                )
-
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 12.dp)
-                        .horizontalScroll(scrollState),
-                    contentAlignment = Alignment.CenterEnd,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .background(TacticalColors.TacticalOrange, shape = androidx.compose.foundation.shape.CircleShape)
+                    )
                     Text(
-                        text = expression.ifEmpty { " " },
-                        style = ExpressionTextStyle.copy(
+                        text = "$angleMode • FLOAT-64",
+                        style = TacticalTypography.TelemetryMicroBadge.copy(
                             fontFamily = FontFamily.Monospace,
-                            fontSize = 18.sp,
-                            color = TacticalColors.TextSecondary,
+                            fontSize = 10.sp,
+                            color = TacticalColors.TextMuted,
                         ),
-                        textAlign = TextAlign.End,
-                        maxLines = 1,
-                        modifier = Modifier.semantics {
-                            contentDescription = "Expression: $expression"
-                        },
                     )
                 }
+
+                Text(
+                    text = if (isError) "ERR" else "HIST: READY",
+                    style = TacticalTypography.TelemetryMicroBadge.copy(
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 10.sp,
+                        color = if (isError) Color(0xFFFF4D4D) else TacticalColors.TacticalOrange,
+                    ),
+                )
             }
 
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(8.dp))
 
-            // Main Result Readout Line (Tabular monospace auto-sizing)
+            // Tier 2: Dedicated Formula / Expression Line
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(scrollState),
+                contentAlignment = Alignment.CenterEnd,
+            ) {
+                Text(
+                    text = expression.ifEmpty { " " },
+                    style = ExpressionTextStyle.copy(
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 15.sp,
+                        color = TacticalColors.TextSecondary,
+                    ),
+                    textAlign = TextAlign.End,
+                    maxLines = 1,
+                    modifier = Modifier.semantics {
+                        contentDescription = "Expression: $expression"
+                    },
+                )
+            }
+
+            Spacer(Modifier.height(6.dp))
+
+            // Tier 3: Hero Result Readout Line (Tabular monospace auto-sizing, NO clumsy '= ' prefix)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -184,7 +211,7 @@ fun Display(
                 AnimatedContent(
                     targetState = when {
                         isError -> errorMessage.ifEmpty { "Invalid expression" }
-                        result.isNotEmpty() -> "= $result"
+                        result.isNotEmpty() -> result
                         else -> "0"
                     },
                     transitionSpec = {

@@ -8,6 +8,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.PathParser
 import androidx.compose.ui.unit.dp
 
+/**
+ * Bespoke hardware vector iconography for the Neumorphic Tactical Dark design system.
+ * Optical strokes (2.0 - 2.6 dp), rounded caps & joins, and duo-tone fills.
+ */
 object TacticalIcons {
     private fun vector(
         name: String,
@@ -15,6 +19,7 @@ object TacticalIcons {
         strokeWidth: Float = 2.4f,
         paths: List<String>,
         fillPaths: List<String> = emptyList(),
+        solidFillPaths: List<String> = emptyList(),
     ): ImageVector {
         val builder = ImageVector.Builder(
             name = name,
@@ -28,6 +33,14 @@ object TacticalIcons {
             builder.addPath(
                 pathData = PathParser().parsePathString(fillData).toNodes(),
                 fill = SolidColor(Color.White.copy(alpha = 0.16f)),
+                stroke = null,
+            )
+        }
+
+        solidFillPaths.forEach { solidData ->
+            builder.addPath(
+                pathData = PathParser().parsePathString(solidData).toNodes(),
+                fill = SolidColor(Color.White),
                 stroke = null,
             )
         }
@@ -47,25 +60,16 @@ object TacticalIcons {
     }
 
     // ── Keypad Operators & Utility zone ───────────────────────────────────────
-    val Clear: ImageVector = vector(
-        name = "Clear",
-        viewportSize = 28f,
-        strokeWidth = 2.6f,
-        paths = listOf(
-            "M 20 9.5 A 7.5 7.5 0 1 0 20 18.5"
-        )
-    )
-
     val Backspace: ImageVector = vector(
         name = "Backspace",
         viewportSize = 28f,
         strokeWidth = 2.4f,
         paths = listOf(
-            "M 10.4 6.8 H 20.6 A 2.8 2.8 0 0 1 23.4 9.6 v 8.8 a 2.8 2.8 0 0 1 -2.8 2.8 H 10.4 a 2.8 2.8 0 0 1 -2.15 -1 L 4.1 15.3 a 2 2 0 0 1 0 -2.6 l 4.15 -4.9 a 2.8 2.8 0 0 1 2.15 -1 Z",
+            "M 10.4 6.8 H 20.6 A 2.8 2.8 0 0 1 23.4 9.6 V 18.4 A 2.8 2.8 0 0 1 20.6 21.2 H 10.4 A 2.8 2.8 0 0 1 8.25 20.2 L 4.1 15.3 A 2 2 0 0 1 4.1 12.7 L 8.25 7.8 A 2.8 2.8 0 0 1 10.4 6.8 Z",
             "M 13.5 11.5 L 18.5 16.5 M 18.5 11.5 L 13.5 16.5"
         ),
         fillPaths = listOf(
-            "M 10.4 6.8 H 20.6 A 2.8 2.8 0 0 1 23.4 9.6 v 8.8 a 2.8 2.8 0 0 1 -2.8 2.8 H 10.4 a 2.8 2.8 0 0 1 -2.15 -1 L 4.1 15.3 a 2 2 0 0 1 0 -2.6 l 4.15 -4.9 a 2.8 2.8 0 0 1 2.15 -1 Z"
+            "M 10.4 6.8 H 20.6 A 2.8 2.8 0 0 1 23.4 9.6 V 18.4 A 2.8 2.8 0 0 1 20.6 21.2 H 10.4 A 2.8 2.8 0 0 1 8.25 20.2 L 4.1 15.3 A 2 2 0 0 1 4.1 12.7 L 8.25 7.8 A 2.8 2.8 0 0 1 10.4 6.8 Z"
         )
     )
 
@@ -74,9 +78,11 @@ object TacticalIcons {
         viewportSize = 28f,
         strokeWidth = 2.4f,
         paths = listOf(
-            "M 8.5 19.5 L 19.5 8.5",
-            "M 7.2 9.5 A 2.3 2.3 0 1 0 11.8 9.5 A 2.3 2.3 0 1 0 7.2 9.5",
-            "M 16.2 18.5 A 2.3 2.3 0 1 0 20.8 18.5 A 2.3 2.3 0 1 0 16.2 18.5"
+            "M 8.5 19.5 L 19.5 8.5"
+        ),
+        solidFillPaths = listOf(
+            "M 9.5 9.5 m -2.3 0 a 2.3 2.3 0 1 0 4.6 0 a 2.3 2.3 0 1 0 -4.6 0 Z",
+            "M 18.5 18.5 m -2.3 0 a 2.3 2.3 0 1 0 4.6 0 a 2.3 2.3 0 1 0 -4.6 0 Z"
         )
     )
 
@@ -85,9 +91,11 @@ object TacticalIcons {
         viewportSize = 28f,
         strokeWidth = 2.6f,
         paths = listOf(
-            "M 7.5 14 H 20.5",
-            "M 12.1 8.2 A 1.9 1.9 0 1 0 15.9 8.2 A 1.9 1.9 0 1 0 12.1 8.2",
-            "M 12.1 19.8 A 1.9 1.9 0 1 0 15.9 19.8 A 1.9 1.9 0 1 0 12.1 19.8"
+            "M 7.5 14 H 20.5"
+        ),
+        solidFillPaths = listOf(
+            "M 14 8.2 m -2.0 0 a 2.0 2.0 0 1 0 4.0 0 a 2.0 2.0 0 1 0 -4.0 0 Z",
+            "M 14 19.8 m -2.0 0 a 2.0 2.0 0 1 0 4.0 0 a 2.0 2.0 0 1 0 -4.0 0 Z"
         )
     )
 
@@ -188,11 +196,11 @@ object TacticalIcons {
         viewportSize = 24f,
         strokeWidth = 2.0f,
         paths = listOf(
-            "M 8 8 A 4 4 0 1 0 16 8 A 4 4 0 1 0 8 8 Z",
+            "M 12 4 A 4 4 0 1 0 12 12 A 4 4 0 1 0 12 4 Z",
             "M 5 20 C 6.5 16 17.5 16 19 20"
         ),
         fillPaths = listOf(
-            "M 8 8 A 4 4 0 1 0 16 8 A 4 4 0 1 0 8 8 Z"
+            "M 12 4 A 4 4 0 1 0 12 12 A 4 4 0 1 0 12 4 Z"
         )
     )
 
@@ -225,15 +233,14 @@ object TacticalIcons {
         strokeWidth = 2.0f,
         paths = listOf(
             // Top cylindrical disc cap (ellipse)
-            "M 3.5 5.5 C 3.5 3.95 7.3 2.7 12 2.7 C 16.7 2.7 20.5 3.95 20.5 5.5 C 20.5 7.05 16.7 8.3 12 8.3 C 7.3 8.3 3.5 7.05 3.5 5.5 Z",
+            "M 4 6 C 4 3.8 7.6 2 12 2 C 16.4 2 20 3.8 20 6 C 20 8.2 16.4 10 12 10 C 7.6 10 4 8.2 4 6 Z",
             // Middle tier shelf
-            "M 3.5 11.5 C 3.5 13.05 7.3 14.3 12 14.3 C 16.7 14.3 20.5 13.05 20.5 11.5",
+            "M 4 12 C 4 14.2 7.6 16 12 16 C 16.4 16 20 14.2 20 12",
             // Outer hull rails and bottom curved base
-            "M 3.5 5.5 V 17.5 C 3.5 19.05 7.3 20.3 12 20.3 C 16.7 20.3 20.5 19.05 20.5 17.5 V 5.5"
+            "M 4 6 V 18 C 4 20.2 7.6 22 12 22 C 16.4 22 20 20.2 20 18 V 6"
         ),
         fillPaths = listOf(
-            // Subtle glowing sheen on top storage disc
-            "M 3.5 5.5 C 3.5 3.95 7.3 2.7 12 2.7 C 16.7 2.7 20.5 3.95 20.5 5.5 C 20.5 7.05 16.7 8.3 12 8.3 C 7.3 8.3 3.5 7.05 3.5 5.5 Z"
+            "M 4 6 C 4 3.8 7.6 2 12 2 C 16.4 2 20 3.8 20 6 C 20 8.2 16.4 10 12 10 C 7.6 10 4 8.2 4 6 Z"
         )
     )
 
@@ -242,11 +249,11 @@ object TacticalIcons {
         viewportSize = 24f,
         strokeWidth = 2.0f,
         paths = listOf(
-            "M 6 4 H 18 A 3 3 0 0 1 21 7 V 18 A 3 3 0 0 1 18 21 H 6 A 3 3 0 0 1 3 7 V 7 A 3 3 0 0 1 6 4 Z",
+            "M 6 4 H 18 A 3 3 0 0 1 21 7 V 18 A 3 3 0 0 1 18 21 H 6 A 3 3 0 0 1 3 18 V 7 A 3 3 0 0 1 6 4 Z",
             "M 16 2 V 6 M 8 2 V 6 M 3 9 H 21"
         ),
         fillPaths = listOf(
-            "M 6 4 H 18 A 3 3 0 0 1 21 7 V 18 A 3 3 0 0 1 18 21 H 6 A 3 3 0 0 1 3 7 V 7 A 3 3 0 0 1 6 4 Z"
+            "M 6 4 H 18 A 3 3 0 0 1 21 7 V 18 A 3 3 0 0 1 18 21 H 6 A 3 3 0 0 1 3 18 V 7 A 3 3 0 0 1 6 4 Z"
         )
     )
 
@@ -305,8 +312,10 @@ object TacticalIcons {
         strokeWidth = 2.0f,
         paths = listOf(
             "M 4.9 19.1 A 10 10 0 1 1 19.1 19.1",
-            "M 12 14 L 16 10",
-            "M 10.5 14 A 1.5 1.5 0 1 0 13.5 14 A 1.5 1.5 0 1 0 10.5 14 Z"
+            "M 12 14 L 16 10"
+        ),
+        solidFillPaths = listOf(
+            "M 12 14 m -1.6 0 a 1.6 1.6 0 1 0 3.2 0 a 1.6 1.6 0 1 0 -3.2 0 Z"
         )
     )
 
@@ -315,11 +324,13 @@ object TacticalIcons {
         viewportSize = 24f,
         strokeWidth = 2.0f,
         paths = listOf(
-            "M 14 14.76 V 5 A 2 2 0 1 0 10 5 V 14.76 A 4 4 0 1 0 14 14.76 Z",
-            "M 10.5 17.5 A 1.5 1.5 0 1 0 13.5 17.5 A 1.5 1.5 0 1 0 10.5 17.5 Z"
+            "M 14 14.76 V 5 A 2 2 0 1 0 10 5 V 14.76 A 4 4 0 1 0 14 14.76 Z"
         ),
         fillPaths = listOf(
             "M 14 14.76 V 5 A 2 2 0 1 0 10 5 V 14.76 A 4 4 0 1 0 14 14.76 Z"
+        ),
+        solidFillPaths = listOf(
+            "M 12 17.5 m -1.5 0 a 1.5 1.5 0 1 0 3.0 0 a 1.5 1.5 0 1 0 -3.0 0 Z"
         )
     )
 

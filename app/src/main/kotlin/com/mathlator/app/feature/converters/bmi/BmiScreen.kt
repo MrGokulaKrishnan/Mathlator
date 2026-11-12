@@ -86,7 +86,7 @@ fun BmiScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("BMI Biometric Analyzer", style = TitleTextStyle, color = TacticalColors.TextPrimary) },
+                title = { Text("BMI", style = TitleTextStyle, color = TacticalColors.TextPrimary) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -138,7 +138,7 @@ fun BmiScreen(
             // ── Interactive Stepper Cards ─────────────────────────────────────
             if (state.unitSystem == UnitSystem.METRIC) {
                 StepperInputCard(
-                    label = "HEIGHT (CM)",
+                    label = "Height (cm)",
                     value = state.heightCm,
                     onValueChange = { viewModel.setHeightCm(it) },
                     onDecrement = {
@@ -154,7 +154,7 @@ fun BmiScreen(
                 Spacer(Modifier.height(10.dp))
 
                 StepperInputCard(
-                    label = "WEIGHT (KG)",
+                    label = "Weight (kg)",
                     value = state.weightKg,
                     onValueChange = { viewModel.setWeightKg(it) },
                     onDecrement = {
@@ -172,7 +172,7 @@ fun BmiScreen(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
                     StepperInputCard(
-                        label = "HEIGHT (FT)",
+                        label = "Height (ft)",
                         value = state.heightFt,
                         onValueChange = { viewModel.setHeightFt(it) },
                         onDecrement = {
@@ -186,7 +186,7 @@ fun BmiScreen(
                         modifier = Modifier.weight(1f),
                     )
                     StepperInputCard(
-                        label = "HEIGHT (IN)",
+                        label = "Height (in)",
                         value = state.heightIn,
                         onValueChange = { viewModel.setHeightIn(it) },
                         onDecrement = {
@@ -204,7 +204,7 @@ fun BmiScreen(
                 Spacer(Modifier.height(10.dp))
 
                 StepperInputCard(
-                    label = "WEIGHT (LB)",
+                    label = "Weight (lb)",
                     value = state.weightLb,
                     onValueChange = { viewModel.setWeightLb(it) },
                     onDecrement = {
@@ -284,7 +284,7 @@ fun BmiScreen(
                     ) {
                         Column {
                             Text(
-                                text = "BIOMETRIC SCORE",
+                                text = "BIOMETRIC INDEX",
                                 style = TacticalTypography.TelemetryMicroBadge,
                             )
                             Spacer(Modifier.height(2.dp))

@@ -167,7 +167,7 @@ fun UnitConverterScreen(
                 Column(modifier = Modifier.fillMaxWidth()) {
                     // FROM Card
                     TacticalUnitCard(
-                        label = "FROM",
+                        label = "FROM INPUT",
                         value = state.fromValue,
                         unitSymbol = if (state.category == ConverterCategory.Temperature) state.fromTemp.symbol else state.fromUnit.symbol,
                         unitName = if (state.category == ConverterCategory.Temperature) state.fromTemp.name else state.fromUnit.nameResKey,
@@ -180,7 +180,7 @@ fun UnitConverterScreen(
 
                     // TO Card
                     TacticalUnitCard(
-                        label = "TO",
+                        label = "CONVERTED OUTPUT",
                         value = state.toValue,
                         unitSymbol = if (state.category == ConverterCategory.Temperature) state.toTemp.symbol else state.toUnit.symbol,
                         unitName = if (state.category == ConverterCategory.Temperature) state.toTemp.name else state.toUnit.nameResKey,
@@ -247,8 +247,12 @@ fun UnitConverterScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "All units preview (${state.allUnitsValues.size})",
-                        style = TacticalTypography.TelemetryLabel.copy(color = TacticalColors.TacticalOrange),
+                        text = "All units live conversion",
+                        style = TacticalTypography.TelemetryLabel.copy(
+                            color = TacticalColors.TacticalOrange,
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 11.sp,
+                        ),
                     )
                     Icon(
                         imageVector = if (state.isAllUnitsExpanded) Icons.Outlined.KeyboardArrowUp else Icons.Outlined.KeyboardArrowDown,

@@ -151,16 +151,19 @@ fun TacticalCalculatorKeypad(
             TacticalKeycapButton(
                 onClick = onClear,
                 brush = TacticalColors.KeycapUtilBase,
-                contentDescription = "Clear",
+                contentDescription = "All Clear",
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
             ) {
-                Icon(
-                    imageVector = TacticalIcons.Clear,
-                    contentDescription = null,
-                    tint = TacticalColors.TacticalOrange,
-                    modifier = Modifier.size(26.dp),
+                Text(
+                    text = "AC",
+                    style = TacticalTypography.KeycapUtilLabel.copy(
+                        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                    ),
+                    color = TacticalColors.TacticalOrange,
                 )
             }
             TacticalKeycapButton(
@@ -389,14 +392,17 @@ fun TacticalConverterKeypad(
             TacticalKeycapButton(
                 onClick = onClear,
                 brush = TacticalColors.KeycapUtilBase,
-                contentDescription = "Clear",
+                contentDescription = "All Clear",
                 modifier = Modifier.weight(1f).fillMaxHeight(),
             ) {
-                Icon(
-                    imageVector = TacticalIcons.Clear,
-                    contentDescription = null,
-                    tint = TacticalColors.TacticalOrange,
-                    modifier = Modifier.size(24.dp),
+                Text(
+                    text = "AC",
+                    style = TacticalTypography.KeycapUtilLabel.copy(
+                        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                    ),
+                    color = TacticalColors.TacticalOrange,
                 )
             }
         }

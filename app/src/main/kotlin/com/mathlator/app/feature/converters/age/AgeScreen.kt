@@ -92,7 +92,7 @@ fun AgeScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Age Chrono Telemetry", style = TitleTextStyle, color = TacticalColors.TextPrimary) },
+                title = { Text("Age", style = TitleTextStyle, color = TacticalColors.TextPrimary) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -115,7 +115,7 @@ fun AgeScreen(
         ) {
             // ── Dual Recessed Date Picker Cards ───────────────────────────────
             RecessedDatePickerCard(
-                badge = "DATE OF BIRTH",
+                badge = "Date of birth",
                 dateStr = state.dob.format(dateFormatter),
                 onClick = { showDobPicker = true },
             )
@@ -123,7 +123,7 @@ fun AgeScreen(
             Spacer(Modifier.height(10.dp))
 
             RecessedDatePickerCard(
-                badge = "AGE AT TARGET DATE",
+                badge = "Age at target date",
                 dateStr = state.ageAt.format(dateFormatter),
                 onClick = { showAgeAtPicker = true },
             )
@@ -171,7 +171,7 @@ fun AgeScreen(
 
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "CALCULATED CHRONO AGE",
+                                text = "CHRONO TELEMETRY READOUT",
                                 style = TacticalTypography.TelemetryMicroBadge,
                             )
                             Spacer(Modifier.height(4.dp))
@@ -198,13 +198,13 @@ fun AgeScreen(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
                         AgeBentoTile(
-                            label = "TOTAL MONTHS",
+                            label = "Total months",
                             value = "${r.totalMonths}",
                             unit = "months",
                             modifier = Modifier.weight(1f),
                         )
                         AgeBentoTile(
-                            label = "TOTAL WEEKS",
+                            label = "Total weeks",
                             value = "${r.totalWeeks}",
                             unit = "weeks",
                             modifier = Modifier.weight(1f),
@@ -216,13 +216,13 @@ fun AgeScreen(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
                         AgeBentoTile(
-                            label = "TOTAL DAYS",
+                            label = "Total days",
                             value = "${r.totalDays}",
                             unit = "days",
                             modifier = Modifier.weight(1f),
                         )
                         AgeBentoTile(
-                            label = "TOTAL HOURS",
+                            label = "Total hours",
                             value = "${r.totalHours}",
                             unit = "hours",
                             modifier = Modifier.weight(1f),
@@ -247,7 +247,7 @@ fun AgeScreen(
                         ) {
                             Column {
                                 Text(
-                                    text = "NEXT BIRTHDAY",
+                                    text = "Next birthday",
                                     style = TacticalTypography.TelemetryLabel,
                                 )
                                 Text(

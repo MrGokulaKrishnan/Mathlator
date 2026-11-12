@@ -49,30 +49,30 @@ fun ConvertersScreen(
     onNavigateToRoute: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // Strict order per Section 7:
-    // Age, Area, BMI, Data, Date, Discount, Length, Mass, Numeral system, Speed, Temperature, Time, Volume
+    // Strict order matching Neumorphic Tactical Dark prototype:
+    // Age, Area, BMI, Data, Date, Discount, Length, Mass, Numeral, Speed, Temp, Time, Volume
     val tools = listOf(
-        BentoToolItem("Age", "yr • mo • day", TacticalIcons.Age, Screen.AgeConverter.route),
-        BentoToolItem("Area", "m² • ac • ha", TacticalIcons.Area, Screen.UnitConverter.route("area")),
-        BentoToolItem("BMI", "kg/m² • index", TacticalIcons.Bmi, Screen.BmiConverter.route),
-        BentoToolItem("Data", "MB • GiB • TB", TacticalIcons.Data, Screen.UnitConverter.route("data")),
-        BentoToolItem("Date", "diff • add/sub", TacticalIcons.Date, Screen.DateConverter.route),
-        BentoToolItem("Discount", "off • tax", TacticalIcons.Discount, Screen.DiscountConverter.route),
+        BentoToolItem("Age", "Y • M • D", TacticalIcons.Age, Screen.AgeConverter.route),
+        BentoToolItem("Area", "mm² → cm²", TacticalIcons.Area, Screen.UnitConverter.route("area")),
+        BentoToolItem("BMI", "kg / m²", TacticalIcons.Bmi, Screen.BmiConverter.route),
+        BentoToolItem("Data", "bit → Byte", TacticalIcons.Data, Screen.UnitConverter.route("data")),
+        BentoToolItem("Date", "Diff Days", TacticalIcons.Date, Screen.DateConverter.route),
+        BentoToolItem("Discount", "% Off", TacticalIcons.Discount, Screen.DiscountConverter.route),
         BentoToolItem("Length", "m • ft • in", TacticalIcons.Length, Screen.UnitConverter.route("length")),
-        BentoToolItem("Mass", "kg • lb • oz", TacticalIcons.Mass, Screen.UnitConverter.route("mass")),
-        BentoToolItem("Numeral", "HEX • DEC", TacticalIcons.Numeral, Screen.NumeralConverter.route),
+        BentoToolItem("Mass", "mg → g", TacticalIcons.Mass, Screen.UnitConverter.route("mass")),
+        BentoToolItem("Numeral", "HEX • BIN", TacticalIcons.Numeral, Screen.NumeralConverter.route),
         BentoToolItem("Speed", "km/h • mph", TacticalIcons.Speed, Screen.UnitConverter.route("speed")),
-        BentoToolItem("Temperature", "°C • °F • K", TacticalIcons.Temperature, Screen.UnitConverter.route("temperature")),
-        BentoToolItem("Time", "hr • min • s", TacticalIcons.Time, Screen.UnitConverter.route("time")),
-        BentoToolItem("Volume", "L • gal • m³", TacticalIcons.Volume, Screen.UnitConverter.route("volume")),
+        BentoToolItem("Temp", "°C • °F • K", TacticalIcons.Temperature, Screen.UnitConverter.route("temperature")),
+        BentoToolItem("Time", "ms • s • hr", TacticalIcons.Time, Screen.UnitConverter.route("time")),
+        BentoToolItem("Volume", "mL • L • gal", TacticalIcons.Volume, Screen.UnitConverter.route("volume")),
     )
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 14.dp, vertical = 8.dp),
-        contentPadding = PaddingValues(top = 8.dp, bottom = 24.dp),
+            .padding(horizontal = 12.dp, vertical = 6.dp),
+        contentPadding = PaddingValues(top = 6.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(TacticalDimens.BentoCardSpacing),
         horizontalArrangement = Arrangement.spacedBy(TacticalDimens.BentoCardSpacing),
     ) {
@@ -82,7 +82,7 @@ fun ConvertersScreen(
 
             Box(
                 modifier = Modifier
-                    .height(118.dp)
+                    .height(108.dp)
                     .tacticalCard(
                         cornerRadius = TacticalDimens.CardCornerRadius,
                         isPressed = isPressed,
@@ -92,7 +92,7 @@ fun ConvertersScreen(
                         indication = ripple(bounded = true, radius = 48.dp),
                         onClick = { onNavigateToRoute(item.route) },
                     )
-                    .padding(horizontal = 8.dp, vertical = 10.dp)
+                    .padding(horizontal = 6.dp, vertical = 8.dp)
                     .semantics { contentDescription = "${item.title} converter" },
                 contentAlignment = Alignment.Center,
             ) {
@@ -104,19 +104,19 @@ fun ConvertersScreen(
                     // Etched Icon Socket
                     Box(
                         modifier = Modifier
-                            .size(42.dp)
-                            .tacticalSocket(cornerRadius = 12.dp),
+                            .size(38.dp)
+                            .tacticalSocket(cornerRadius = 10.dp),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
                             imageVector = item.icon,
                             contentDescription = null,
                             tint = TacticalColors.TacticalOrange,
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(22.dp),
                         )
                     }
 
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(6.dp))
 
                     Text(
                         text = item.title,
@@ -124,11 +124,15 @@ fun ConvertersScreen(
                         maxLines = 1,
                     )
 
-                    Spacer(Modifier.height(2.dp))
+                    Spacer(Modifier.height(1.dp))
 
                     Text(
                         text = item.subtitle,
-                        style = TacticalTypography.BentoSubtitle,
+                        style = TacticalTypography.BentoSubtitle.copy(
+                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                            fontSize = 9.sp,
+                            color = TacticalColors.TextMuted,
+                        ),
                         maxLines = 1,
                     )
                 }
