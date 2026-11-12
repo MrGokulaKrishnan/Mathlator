@@ -30,7 +30,7 @@ data class CurrencyUiState(
     val mainCode: String = "INR",
     val out1Code: String = "USD",
     val out2Code: String = "EUR",
-    val mainValue: String = "100",
+    val mainValue: String = "1",
     val out1Value: String = "",
     val out2Value: String = "",
     val out1Rate: String = "",

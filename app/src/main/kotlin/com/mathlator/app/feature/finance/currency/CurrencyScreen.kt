@@ -203,9 +203,9 @@ fun CurrencyScreen(
 
                 Spacer(Modifier.height(10.dp))
 
-                // Slot 2: CONVERTED
+                // Slot 2: Converted
                 TargetRackSlot(
-                    targetLabel = "CONVERTED",
+                    targetLabel = "Converted",
                     amount = state.out1Value.ifEmpty { "—" },
                     currencyCode = state.out1Code,
                     rateCaption = state.out1Rate,
@@ -215,9 +215,9 @@ fun CurrencyScreen(
 
                 Spacer(Modifier.height(10.dp))
 
-                // Slot 3: CONVERTED
+                // Slot 3: Converted
                 TargetRackSlot(
-                    targetLabel = "CONVERTED",
+                    targetLabel = "Converted",
                     amount = state.out2Value.ifEmpty { "—" },
                     currencyCode = state.out2Code,
                     rateCaption = state.out2Rate,
@@ -347,7 +347,7 @@ private fun MainRackSlot(
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "MAIN BASE // LIVE INPUT",
+                text = "Main Base",
                 style = TacticalTypography.TelemetryMicroBadge,
             )
 
